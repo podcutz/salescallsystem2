@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lead Qualification & Booking</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000;
+            color: #fff;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .step-content {
+            display: none;
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+
+        .step-content.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .input-underline {
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid #333;
+            outline: none;
+            transition: border-color 0.3s;
+            width: 100%;
+            padding: 10px 0;
+            font-size: 1.5rem;
+            color: #fff;
+        }
+
+        .input-underline:focus {
+            border-color: #fff;
+        }
+
+        .choice-card {
+            border: 1px solid #222;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            background-color: #000;
+        }
+
+        .choice-card:hover, .choice-card.selected {
+            background: #fff;
+            color: #000;
+            border-color: #fff;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1/1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 99px;
+            transition: 0.2s;
+            font-size: 0.875rem;
+        }
+
+        .calendar-day:hover:not(.disabled) {
+            background: #222;
+            color: #fff;
+        }
+
+        .calendar-day.selected {
+            background: #fff !important;
+            color: #000 !important;
+            font-weight: 600;
+        }
+
+        .calendar-day.disabled {
+            opacity: 0.15;
+            cursor: not-allowed;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+        
+        #timeSlotsContainer {
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            max-width: 0;
+            opacity: 0;
+            overflow: hidden;
+        }
+
+        #timeSlotsContainer.open {
+            max-width: 400px;
+            opacity: 1;
+            margin-left: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            #timeSlotsContainer.open {
+                max-width: 100%;
+                margin-left: 0;
+                margin-top: 2rem;
+            }
+        }
+    </style>
+</head>
+<body class="bg-black text-white h-screen flex overflow-hidden">
+
+    <!-- Progress Bar -->
+    <div class="absolute top-0 left-0 h-1 bg-white transition-all duration-500 z-50" id="progressBar" style="width: 25%;"></div>
+
+    <!-- Main Container (Form) -->
+    <div id="mainLayout" class="flex w-full h-full">
+        <!-- Left Panel: Content -->
+        <div id="leftPanel" class="w-full lg:w-1/2 h-full flex flex-col p-8 md:p-20 relative z-10 bg-black transition-all duration-700">
+            <div class="flex-grow flex flex-col justify-center max-w-lg mx-auto w-full">
+                <form id="leadForm">
+                    <div class="step-content active flex-col space-y-6" data-step="1">
+                        <span class="text-zinc-600 font-medium tracking-widest uppercase text-xs">01 — Identification</span>
+                        <h1 class="text-3xl md:text-4xl font-light leading-tight">What's your full name?</h1>
+                        <input type="text" id="nameInput" class="input-underline" placeholder="Type your answer here..." autocomplete="off">
+                        <button type="button" onclick="nextStep()" class="bg-white text-black px-8 py-3 rounded-full font-semibold w-fit hover:bg-zinc-200 transition mt-4">Next Step ↵</button>
+                    </div>
+
+                    <div class="step-content flex-col space-y-6" data-step="2">
+                        <span class="text-zinc-600 font-medium tracking-widest uppercase text-xs">02 — Objective</span>
+                        <h1 class="text-3xl md:text-4xl font-light leading-tight">What is your primary goal?</h1>
+                        <div class="grid grid-cols-1 gap-3 pt-4">
+                            <div class="choice-card p-4 rounded-lg flex items-center space-x-4" onclick="selectChoice(this)">
+                                <span class="border border-zinc-700 px-2 py-1 rounded text-xs opacity-50">A</span>
+                                <span>Scaling Operations</span>
+                            </div>
+                            <div class="choice-card p-4 rounded-lg flex items-center space-x-4" onclick="selectChoice(this)">
+                                <span class="border border-zinc-700 px-2 py-1 rounded text-xs opacity-50">B</span>
+                                <span>Improving Conversion Rate</span>
+                            </div>
+                            <div class="choice-card p-4 rounded-lg flex items-center space-x-4" onclick="selectChoice(this)">
+                                <span class="border border-zinc-700 px-2 py-1 rounded text-xs opacity-50">C</span>
+                                <span>Automating Marketing</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-content flex-col space-y-6" data-step="3">
+                        <span class="text-zinc-600 font-medium tracking-widest uppercase text-xs">03 — Investment</span>
+                        <h1 class="text-3xl md:text-4xl font-light leading-tight">Monthly budget for growth?</h1>
+                        <div class="grid grid-cols-1 gap-3 pt-4">
+                            <div class="choice-card p-4 rounded-lg" onclick="selectChoice(this)">$1k - $5k</div>
+                            <div class="choice-card p-4 rounded-lg" onclick="selectChoice(this)">$5k - $20k</div>
+                            <div class="choice-card p-4 rounded-lg" onclick="selectChoice(this)">$20k+</div>
+                        </div>
+                    </div>
+
+                    <div class="step-content flex-col space-y-6" data-step="4">
+                        <span class="text-zinc-600 font-medium tracking-widest uppercase text-xs">04 — Contact</span>
+                        <h1 class="text-3xl md:text-4xl font-light leading-tight">Lastly, what's your best email address?</h1>
+                        <input type="email" id="emailInput" class="input-underline" placeholder="name@example.com" autocomplete="off">
+                        <button type="button" onclick="finishQualification()" class="bg-white text-black px-8 py-3 rounded-full font-semibold w-fit hover:bg-zinc-200 transition mt-4">Confirm & Schedule</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="navButtons" class="absolute bottom-8 right-8 flex space-x-1">
+                <button onclick="prevStep()" class="bg-zinc-950 p-4 rounded-l-lg hover:bg-zinc-900 border border-zinc-800 transition">
+                    <svg width="14" height="14" viewBox="0 0 12 12" fill="white"><path d="M6 1l-5 5 5 5V1z"/></svg>
+                </button>
+                <button onclick="nextStep()" class="bg-zinc-950 p-4 rounded-r-lg hover:bg-zinc-900 border border-zinc-800 border-l-0 transition">
+                    <svg width="14" height="14" viewBox="0 0 12 12" fill="white"><path d="M6 1l5 5-5 5V1z"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <div id="rightPanel" class="hidden lg:flex w-1/2 h-full bg-black items-center justify-center p-20 relative transition-all duration-700">
+            <div class="absolute left-0 top-1/4 bottom-1/4 w-[1px] bg-gradient-to-b from-transparent via-zinc-800 to-transparent" id="dividerLine"></div>
+            <div id="logoContainer" class="flex flex-col items-center transition-all duration-700 w-full">
+                <img src="https://res.cloudinary.com/dobnqmfsg/image/upload/v1770995309/Screenshot_2026-02-13_151541-removebg-preview_ifdgq3.png" 
+                     alt="Logo" 
+                     id="mainLogo"
+                     class="w-full max-w-sm h-auto object-contain opacity-90 drop-shadow-[0_0_15px_rgba(255,255,255,0.05)] transition-all duration-700">
+            </div>
+        </div>
+    </div>
+
+    <!-- Step 5: Full Screen Booking Interface -->
+    <div id="bookingInterface" class="hidden fixed inset-0 z-40 bg-black flex-col items-center p-8 overflow-y-auto animate-fade-in">
+        <div id="topLogoAnchor" class="w-24 mt-4 mb-12 flex justify-center"></div>
+
+        <!-- Layout Container: Flex row on larger screens -->
+        <div class="flex flex-col md:flex-row items-start justify-center w-full max-w-5xl mx-auto">
+            
+            <!-- Calendar Side -->
+            <div class="w-full max-w-md bg-zinc-950/50 p-8 rounded-3xl border border-zinc-900/50">
+                <div class="mb-8">
+                    <h1 class="text-2xl font-light">Select a Date</h1>
+                    <p class="text-zinc-500 text-sm mt-1">Available strategy sessions.</p>
+                </div>
+                
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="font-medium text-zinc-300">March 2024</h2>
+                    <div class="flex space-x-1">
+                        <button class="p-2 hover:bg-zinc-800 rounded-full transition"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></button>
+                        <button class="p-2 hover:bg-zinc-800 rounded-full transition"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></button>
+                    </div>
+                </div>
+                <div class="grid grid-cols-7 gap-1 text-center text-[10px] tracking-widest text-zinc-600 mb-4 uppercase font-semibold">
+                    <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+                </div>
+                <div class="grid grid-cols-7 gap-2" id="calendarGrid"></div>
+            </div>
+
+            <!-- Time Slots Side (Aligned right beside calendar on desktop) -->
+            <div id="timeSlotsContainer" class="w-full flex flex-col">
+                <div class="mb-6">
+                    <h3 id="selectedDateLabel" class="text-zinc-400 font-medium">Friday, March 15</h3>
+                    <p class="text-zinc-600 text-[10px] tracking-widest uppercase mt-1">Select an available slot (GMT)</p>
+                </div>
+                <div class="space-y-2 max-h-[420px] overflow-y-auto pr-2" id="timeSlotsList">
+                    <!-- Filled via JS -->
+                </div>
+            </div>
+        </div>
+        <div class="h-20"></div> <!-- Spacer -->
+    </div>
+
+    <!-- Final Confirmation Message -->
+    <div id="successMessage" class="hidden fixed inset-0 z-50 bg-black flex-col items-center justify-center text-center p-8 animate-fade-in">
+        <div class="w-20 h-20 bg-white text-black rounded-full flex items-center justify-center mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+        </div>
+        <h1 class="text-4xl font-light mb-4">You're all set!</h1>
+        <p class="text-zinc-500 max-w-md mx-auto leading-relaxed">We've sent a confirmation email with the meeting details. Our team is excited to help you scale.</p>
+        <button onclick="location.reload()" class="mt-12 text-zinc-700 hover:text-white transition text-sm uppercase tracking-widest">Back to Start</button>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 4;
+
+        function updateProgress() {
+            const percentage = (currentStep / totalSteps) * 100;
+            document.getElementById('progressBar').style.width = percentage + '%';
+        }
+
+        function showStep(step) {
+            document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
+            const activeStep = document.querySelector(`[data-step="${step}"]`);
+            if (activeStep) activeStep.classList.add('active');
+            updateProgress();
+        }
+
+        function nextStep() {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                showStep(currentStep);
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                showStep(currentStep);
+            }
+        }
+
+        function selectChoice(element) {
+            const parent = element.parentElement;
+            parent.querySelectorAll('.choice-card').forEach(card => card.classList.remove('selected'));
+            element.classList.add('selected');
+            setTimeout(nextStep, 500);
+        }
+
+        function finishQualification() {
+            const leftPanel = document.getElementById('leftPanel');
+            const rightPanel = document.getElementById('rightPanel');
+            const divider = document.getElementById('dividerLine');
+            const logo = document.getElementById('mainLogo');
+            
+            leftPanel.style.opacity = '0';
+            divider.style.opacity = '0';
+            
+            logo.classList.replace('max-w-sm', 'max-w-[100px]');
+            rightPanel.classList.remove('lg:w-1/2');
+            rightPanel.classList.add('w-full', 'items-start', 'pt-12');
+            
+            setTimeout(() => {
+                document.getElementById('mainLayout').classList.add('hidden');
+                document.getElementById('bookingInterface').classList.remove('hidden');
+                document.getElementById('bookingInterface').classList.add('flex');
+                document.getElementById('topLogoAnchor').appendChild(logo);
+                generateCalendar();
+            }, 600);
+
+            document.getElementById('progressBar').style.width = '100%';
+        }
+
+        function generateCalendar() {
+            const grid = document.getElementById('calendarGrid');
+            grid.innerHTML = '';
+            const today = new Date().getDate();
+            
+            for (let i = 1; i <= 31; i++) {
+                const day = document.createElement('div');
+                day.className = 'calendar-day';
+                day.innerText = i;
+                
+                if (i < today + 1 || i % 7 === 0 || i % 7 === 6) {
+                    day.classList.add('disabled');
+                } else {
+                    day.onclick = () => {
+                        document.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('selected'));
+                        day.classList.add('selected');
+                        document.getElementById('selectedDateLabel').innerText = `March ${i}, 2024`;
+                        renderTimeSlots();
+                        document.getElementById('timeSlotsContainer').classList.add('open');
+                    };
+                }
+                grid.appendChild(day);
+            }
+        }
+
+        function renderTimeSlots() {
+            const list = document.getElementById('timeSlotsList');
+            list.innerHTML = '';
+            
+            // 10:00 AM to 6:00 PM in 30min intervals
+            let hour = 10;
+            let minutes = 0;
+            
+            while (hour < 18) {
+                const startTime = formatTime(hour, minutes);
+                
+                // Advance by 30 mins
+                let endHour = hour;
+                let endMinutes = minutes + 30;
+                if (endMinutes === 60) {
+                    endHour++;
+                    endMinutes = 0;
+                }
+                
+                const endTime = formatTime(endHour, endMinutes);
+                const ampm = endHour >= 12 ? 'pm' : 'am';
+                
+                const slotBtn = document.createElement('button');
+                slotBtn.className = "w-full py-4 rounded-xl border border-zinc-900 bg-zinc-950/50 hover:border-white transition group flex justify-between px-6 items-center mb-2";
+                slotBtn.innerHTML = `
+                    <span class="text-sm font-medium tracking-tight">${startTime}-${endTime} ${ampm} (GMT)</span>
+                    <span class="text-[10px] uppercase tracking-widest text-zinc-600 group-hover:text-white transition">Select →</span>
+                `;
+                slotBtn.onclick = confirmBooking;
+                list.appendChild(slotBtn);
+                
+                hour = endHour;
+                minutes = endMinutes;
+            }
+        }
+
+        function formatTime(h, m) {
+            let displayH = h > 12 ? h - 12 : h;
+            let displayM = m === 0 ? "00" : m;
+            return `${displayH}:${displayM}`;
+        }
+
+        function confirmBooking() {
+            document.getElementById('bookingInterface').classList.add('hidden');
+            document.getElementById('successMessage').classList.remove('hidden');
+            document.getElementById('successMessage').classList.add('flex');
+            document.getElementById('progressBar').classList.add('opacity-0');
+        }
+
+        document.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                if (document.getElementById('bookingInterface').classList.contains('hidden')) {
+                    if (currentStep === totalSteps) finishQualification();
+                    else nextStep();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
