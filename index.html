@@ -121,8 +121,8 @@
     <!-- Main Container (Form) -->
     <div id="mainLayout" class="flex w-full h-full">
         <!-- Left Panel: Content -->
-        <div id="leftPanel" class="w-full lg:w-1/2 h-full flex flex-col p-8 md:p-20 relative z-10 bg-black transition-all duration-700">
-            <div class="flex-grow flex flex-col justify-center max-w-lg mx-auto w-full">
+        <div id="leftPanel" class="w-full lg:w-1/2 h-full flex flex-col p-8 md:p-12 md:pb-32 relative z-10 bg-black transition-all duration-700">
+            <div class="flex-grow flex flex-col justify-center md:justify-start md:pt-[10vh] max-w-lg mx-auto w-full">
                 <form id="leadForm">
                     <div class="step-content active flex-col space-y-6" data-step="1">
                         <span class="text-zinc-600 font-medium tracking-widest uppercase text-xs">01 — Identity</span>
@@ -244,7 +244,7 @@
 
         <div class="flex flex-col md:flex-row items-start justify-center w-full max-w-5xl mx-auto gap-6 relative mt-2">
             
-            <div class="w-full max-w-md bg-zinc-950/50 p-8 rounded-3xl border border-zinc-900/50 mt-[48px]">
+            <div class="w-full max-w-md bg-zinc-950/50 p-8 rounded-3xl border border-zinc-900/50">
                 <div class="mb-8">
                     <h1 class="text-2xl font-light">Select a Date</h1>
                     <p class="text-zinc-500 text-sm mt-1">Available strategy sessions.</p>
@@ -263,18 +263,18 @@
                 <div class="grid grid-cols-7 gap-2" id="calendarGrid"></div>
             </div>
 
-            <div id="timeSlotsContainer" class="w-full flex flex-col relative">
-                <div class="h-[48px] w-full relative mb-0 flex items-end">
-                    <div id="bookNowBtnContainer" class="hidden absolute bottom-2 left-0">
-                        <button onclick="confirmBooking()" class="bg-white text-black px-8 py-2.5 rounded-full font-semibold w-fit hover:bg-zinc-200 transition text-sm">Book Now →</button>
+            <div id="timeSlotsContainer" class="w-full flex flex-col relative pt-8">
+                <div class="flex justify-between items-start mb-8 min-h-[60px]">
+                    <div>
+                        <h3 id="selectedDateLabel" class="text-2xl font-light text-white">March 19, 2024</h3>
+                        <p class="text-zinc-600 text-[10px] tracking-widest uppercase mt-1">Select an available slot (GMT)</p>
                     </div>
-                </div>
-                <div class="mb-6">
-                    <h3 id="selectedDateLabel" class="text-zinc-400 font-medium text-2xl font-light text-white">Select Date = March 19, 2024</h3>
-                    <p class="text-zinc-600 text-[10px] tracking-widest uppercase mt-1">Select an available slot (GMT)</p>
+                    <div id="bookNowBtnContainer" class="hidden">
+                        <button onclick="confirmBooking()" class="bg-white text-black px-6 py-2.5 rounded-full font-semibold w-fit hover:bg-zinc-200 transition text-sm shadow-lg">Book Now →</button>
+                    </div>
                 </div>
                 <div class="space-y-2 max-h-[420px] overflow-y-auto pr-2" id="timeSlotsList">
-                    </div>
+                </div>
             </div>
         </div>
         <div class="h-20"></div> <!-- Spacer -->
@@ -459,7 +459,7 @@
                     day.onclick = () => {
                         document.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('selected'));
                         day.classList.add('selected');
-                        document.getElementById('selectedDateLabel').innerText = `Select Date = March ${i}, 2024`;
+                        document.getElementById('selectedDateLabel').innerText = `March ${i}, 2024`;
                         renderTimeSlots();
                         document.getElementById('timeSlotsContainer').classList.add('open');
                         
