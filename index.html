@@ -121,8 +121,8 @@
     <!-- Main Container (Form) -->
     <div id="mainLayout" class="flex w-full h-full">
         <!-- Left Panel: Content -->
-        <div id="leftPanel" class="w-full lg:w-1/2 h-full flex flex-col p-8 md:p-12 md:pb-32 relative z-10 bg-black transition-all duration-700">
-            <div class="flex-grow flex flex-col justify-center md:justify-start md:pt-[10vh] max-w-lg mx-auto w-full">
+        <div id="leftPanel" class="w-full lg:w-1/2 h-full flex flex-col p-8 md:p-12 md:pb-36 relative z-10 bg-black transition-all duration-700 overflow-y-auto">
+            <div class="flex-grow flex flex-col justify-center md:justify-start md:pt-[8vh] max-w-lg mx-auto w-full">
                 <form id="leadForm">
                     <div class="step-content active flex-col space-y-6" data-step="1">
                         <span class="text-zinc-600 font-medium tracking-widest uppercase text-xs">01 — Identity</span>
@@ -217,8 +217,8 @@
                 </form>
             </div>
 
-            <div id="navButtons" class="absolute bottom-8 right-8 flex space-x-1">
-                <button onclick="prevStep()" class="bg-zinc-950 p-4 rounded-l-lg hover:bg-zinc-900 border border-zinc-800 transition">
+            <div id="navButtons" class="fixed bottom-8 right-8 lg:right-[calc(50%+2rem)] flex space-x-1 z-50">
+                <button onclick="prevStep()" class="bg-zinc-950 p-4 rounded-l-lg hover:bg-zinc-900 border border-zinc-800 transition shadow-lg">
                     <svg width="14" height="14" viewBox="0 0 12 12" fill="white"><path d="M6 1l-5 5 5 5V1z"/></svg>
                 </button>
                 <button onclick="nextStep()" id="nextChevron" class="bg-zinc-950 p-4 rounded-r-lg hover:bg-zinc-900 border border-zinc-800 border-l-0 transition opacity-30 pointer-events-none">
