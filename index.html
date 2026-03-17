@@ -122,67 +122,100 @@
     <div id="mainLayout" class="flex w-full h-full">
         <!-- Left Panel: Content -->
         <div id="leftPanel" class="w-full lg:w-1/2 h-full flex flex-col p-8 md:p-12 md:pb-36 relative z-10 bg-black transition-all duration-700 overflow-y-auto">
-            <div class="flex-grow flex flex-col justify-center md:justify-start pt-8 md:pt-[4vh] max-w-lg mx-auto w-full">
+            <div class="flex-grow flex flex-col justify-center md:justify-start pt-4 md:pt-[2vh] max-w-lg mx-auto w-full">
                 <form id="leadForm">
-                    <div class="step-content active flex-col space-y-4" data-step="1">
+                    <div class="step-content active flex-col space-y-2" data-step="1">
                         <span class="text-zinc-600 font-medium tracking-widest uppercase text-[10px] md:text-xs">01 — Identity</span>
-                        <h1 class="text-2xl md:text-3xl font-light leading-tight">Which best describes you?</h1>
-                        <div class="grid grid-cols-1 gap-2 pt-2" id="q1-options">
-                            <div class="choice-card p-3 text-sm rounded-lg" onclick="selectSingleChoice(this, 1)">Content Creator</div>
-                            <div class="choice-card p-3 text-sm rounded-lg" onclick="selectSingleChoice(this, 1)">Business / Brand</div>
-                            <div class="choice-card p-3 text-sm rounded-lg" onclick="selectSingleChoice(this, 1)">Agency</div>
-                            <div class="choice-card p-3 text-sm rounded-lg" onclick="selectSingleChoice(this, 1)">Influencer</div>
-                            <div class="choice-card p-3 text-sm rounded-lg flex flex-col items-start gap-2" onclick="selectOtherChoice(this, 1)">
+                        <h1 class="text-xl md:text-2xl font-light leading-tight">Which best describes you?</h1>
+                        <div class="grid grid-cols-1 gap-1.5 pt-1" id="q1-options">
+                            <div class="choice-card py-2 px-3 text-sm rounded-lg" onclick="selectSingleChoice(this, 1)">Content Creator</div>
+                            <div class="choice-card py-2 px-3 text-sm rounded-lg" onclick="selectSingleChoice(this, 1)">Business / Brand</div>
+                            <div class="choice-card py-2 px-3 text-sm rounded-lg" onclick="selectSingleChoice(this, 1)">Agency</div>
+                            <div class="choice-card py-2 px-3 text-sm rounded-lg" onclick="selectSingleChoice(this, 1)">Influencer</div>
+                            <div class="choice-card py-2 px-3 text-sm rounded-lg flex flex-col items-start gap-1" onclick="selectOtherChoice(this, 1)">
                                 <span>Other</span>
-                                <input type="text" class="input-underline text-sm hidden !py-1" placeholder="Type here..." onclick="event.stopPropagation()" oninput="validateOther(this, 1)">
+                                <input type="text" class="input-underline text-sm hidden !py-0.5" placeholder="Type here..." onclick="event.stopPropagation()" oninput="validateOther(this, 1)">
                             </div>
                         </div>
-                        <button type="button" onclick="nextStep()" class="bg-white text-black px-6 py-2.5 text-sm rounded-full font-semibold w-fit hover:bg-zinc-200 transition mt-3 opacity-50 cursor-not-allowed pointer-events-none" id="btn-next-1">Next Step →</button>
+                        <button type="button" onclick="nextStep()" class="bg-white text-black px-6 py-2 text-sm rounded-full font-semibold w-fit hover:bg-zinc-200 transition mt-2 opacity-50 cursor-not-allowed pointer-events-none" id="btn-next-1">Next Step →</button>
                     </div>
 
-                    <div class="step-content flex-col space-y-4" data-step="2">
+                    <div class="step-content flex-col space-y-2" data-step="2">
                         <span class="text-zinc-600 font-medium tracking-widest uppercase text-[10px] md:text-xs">02 — Platform</span>
-                        <h1 class="text-2xl md:text-3xl font-light leading-tight">Where do you mainly post content? <span class="text-xs text-zinc-500 block mt-1">(Select multiple)</span></h1>
-                        <div class="grid grid-cols-1 gap-2 pt-2" id="q2-options">
-                            <div class="choice-card p-3 text-sm rounded-lg" onclick="toggleMultiChoice(this, 2)">Instagram</div>
-                            <div class="choice-card p-3 text-sm rounded-lg" onclick="toggleMultiChoice(this, 2)">TikTok</div>
-                            <div class="choice-card p-3 text-sm rounded-lg" onclick="toggleMultiChoice(this, 2)">YouTube</div>
-                            <div class="choice-card p-3 text-sm rounded-lg" onclick="toggleMultiChoice(this, 2)">LinkedIn</div>
+                        <h1 class="text-xl md:text-2xl font-light leading-tight">Where do you mainly post content? <span class="text-xs text-zinc-500 block mt-0.5">(Select multiple)</span></h1>
+                        <div class="grid grid-cols-1 gap-1.5 pt-1" id="q2-options">
+                            <div class="choice-card py-2 px-3 text-sm rounded-lg" onclick="toggleMultiChoice(this, 2)">Instagram</div>
+                            <div class="choice-card py-2 px-3 text-sm rounded-lg" onclick="toggleMultiChoice(this, 2)">TikTok</div>
+                            <div class="choice-card py-2 px-3 text-sm rounded-lg" onclick="toggleMultiChoice(this, 2)">YouTube</div>
+                            <div class="choice-card py-2 px-3 text-sm rounded-lg" onclick="toggleMultiChoice(this, 2)">LinkedIn</div>
                         </div>
-                        <button type="button" onclick="nextStep()" class="bg-white text-black px-6 py-2.5 text-sm rounded-full font-semibold w-fit hover:bg-zinc-200 transition mt-3 opacity-50 cursor-not-allowed pointer-events-none" id="btn-next-2">Next Step →</button>
+                        <button type="button" onclick="nextStep()" class="bg-white text-black px-6 py-2 text-sm rounded-full font-semibold w-fit hover:bg-zinc-200 transition mt-2 opacity-50 cursor-not-allowed pointer-events-none" id="btn-next-2">Next Step →</button>
                     </div>
 
-                    <div class="step-content flex-col space-y-4" data-step="3">
+                    <div class="step-content flex-col space-y-2" data-step="3">
                         <span class="text-zinc-600 font-medium tracking-widest uppercase text-[10px] md:text-xs">03 — Content Type</span>
-                        <h1 class="text-2xl md:text-3xl font-light leading-tight">What kind of content do you create? <span class="text-xs text-zinc-500 block mt-1">(Select multiple)</span></h1>
-                        <div class="grid grid-cols-1 gap-2 pt-2" id="q3-options">
-                            <div class="choice-card p-3 text-sm rounded-lg" onclick="toggleMultiChoice(this, 3)">Podcasts / interviews</div>
-                            <div class="choice-card p-3 text-sm rounded-lg" onclick="toggleMultiChoice(this, 3)">Youtube Videos</div>
-                            <div class="choice-card p-3 text-sm rounded-lg" onclick="toggleMultiChoice(this, 3)">Reels / short-form</div>
-                            <div class="choice-card p-3 text-sm rounded-lg" onclick="toggleMultiChoice(this, 3)">Ads / promotional</div>
+                        <h1 class="text-xl md:text-2xl font-light leading-tight">What kind of content do you create? <span class="text-xs text-zinc-500 block mt-0.5">(Select multiple)</span></h1>
+                        <div class="grid grid-cols-1 gap-1.5 pt-1" id="q3-options">
+                            <div class="choice-card py-2 px-3 text-sm rounded-lg" onclick="toggleMultiChoice(this, 3)">Podcasts / interviews</div>
+                            <div class="choice-card py-2 px-3 text-sm rounded-lg" onclick="toggleMultiChoice(this, 3)">Youtube Videos</div>
+                            <div class="choice-card py-2 px-3 text-sm rounded-lg" onclick="toggleMultiChoice(this, 3)">Reels / short-form</div>
+                            <div class="choice-card py-2 px-3 text-sm rounded-lg" onclick="toggleMultiChoice(this, 3)">Ads / promotional</div>
                         </div>
-                        <button type="button" onclick="nextStep()" class="bg-white text-black px-6 py-2.5 text-sm rounded-full font-semibold w-fit hover:bg-zinc-200 transition mt-3 opacity-50 cursor-not-allowed pointer-events-none" id="btn-next-3">Next Step →</button>
+                        <button type="button" onclick="nextStep()" class="bg-white text-black px-6 py-2 text-sm rounded-full font-semibold w-fit hover:bg-zinc-200 transition mt-2 opacity-50 cursor-not-allowed pointer-events-none" id="btn-next-3">Next Step →</button>
                     </div>
 
-                    <div class="step-content flex-col space-y-4" data-step="4">
+                    <div class="step-content flex-col space-y-2" data-step="4">
                         <span class="text-zinc-600 font-medium tracking-widest uppercase text-[10px] md:text-xs">04 — Volume</span>
-                        <h1 class="text-2xl md:text-3xl font-light leading-tight">How much content do you make?</h1>
-                        <div class="grid grid-cols-1 gap-2 pt-2" id="q4-options">
-                            <div class="choice-card p-3 text-sm rounded-lg" onclick="selectSingleChoice(this, 4)">1–5 videos/month</div>
-                            <div class="choice-card p-3 text-sm rounded-lg" onclick="selectSingleChoice(this, 4)">5–15 videos/month</div>
-                            <div class="choice-card p-3 text-sm rounded-lg" onclick="selectSingleChoice(this, 4)">15+ videos/month</div>
+                        <h1 class="text-xl md:text-2xl font-light leading-tight">How much content do you make?</h1>
+                        <div class="grid grid-cols-1 gap-1.5 pt-1" id="q4-options">
+                            <div class="choice-card py-2 px-3 text-sm rounded-lg" onclick="selectSingleChoice(this, 4)">1–5 videos/month</div>
+                            <div class="choice-card py-2 px-3 text-sm rounded-lg" onclick="selectSingleChoice(this, 4)">5–15 videos/month</div>
+                            <div class="choice-card py-2 px-3 text-sm rounded-lg" onclick="selectSingleChoice(this, 4)">15+ videos/month</div>
                         </div>
                     </div>
 
-                    <div class="step-content flex-col space-y-4" data-step="5">
+                    <div class="step-content flex-col space-y-2" data-step="5">
                         <span class="text-zinc-600 font-medium tracking-widest uppercase text-[10px] md:text-xs">05 — Pain Points</span>
-                        <h1 class="text-2xl md:text-3xl font-light leading-tight">What’s the biggest problem with your content right now?</h1>
-                        <div class="grid grid-cols-1 gap-2 pt-2" id="q5-options">
-                            <div class="choice-card p-3 text-sm rounded-lg" onclick="selectSingleChoice(this, 5)">Takes too long to edit</div>
-                            <div class="choice-card p-3 text-sm rounded-lg" onclick="selectSingleChoice(this, 5)">Doesn’t look professional</div>
-                            <div class="choice-card p-3 text-sm rounded-lg" onclick="selectSingleChoice(this, 5)">Not getting engagement</div>
-                            <div class="choice-card p-3 text-sm rounded-lg" onclick="selectSingleChoice(this, 5)">Inconsistent posting</div>
-                            <div class="choice-card p-3 text-sm rounded-lg flex flex-col items-start gap-2" onclick="selectOtherChoice(this, 5)">
+                        <h1 class="text-xl md:text-2xl font-light leading-tight">What’s the biggest problem with your content right now?</h1>
+                        <div class="grid grid-cols-1 gap-1.5 pt-1" id="q5-options">
+                            <div class="choice-card py-2 px-3 text-sm rounded-lg" onclick="selectSingleChoice(this, 5)">Takes too long to edit</div>
+                            <div class="choice-card py-2 px-3 text-sm rounded-lg" onclick="selectSingleChoice(this, 5)">Doesn’t look professional</div>
+                            <div class="choice-card py-2 px-3 text-sm rounded-lg" onclick="selectSingleChoice(this, 5)">Not getting engagement</div>
+                            <div class="choice-card py-2 px-3 text-sm rounded-lg" onclick="selectSingleChoice(this, 5)">Inconsistent posting</div>
+                            <div class="choice-card py-2 px-3 text-sm rounded-lg flex flex-col items-start gap-1" onclick="selectOtherChoice(this, 5)">
+                                <span>Other</span>
+                                <input type="text" class="input-underline text-sm hidden !py-0.5" placeholder="Optional short text..." onclick="event.stopPropagation()" oninput="validateOther(this, 5)">
+                            </div>
+                        </div>
+                        <button type="button" onclick="nextStep()" class="bg-white text-black px-6 py-2 text-sm rounded-full font-semibold w-fit hover:bg-zinc-200 transition mt-2 opacity-50 cursor-not-allowed pointer-events-none" id="btn-next-5">Next Step →</button>
+                    </div>
+
+                    <div class="step-content flex-col space-y-2" data-step="6">
+                        <span class="text-zinc-600 font-medium tracking-widest uppercase text-[10px] md:text-xs">06 — Style</span>
+                        <h1 class="text-xl md:text-2xl font-light leading-tight">What kind of editing style do you prefer?</h1>
+                        <div class="grid grid-cols-1 gap-1.5 pt-1" id="q6-options">
+                            <div class="choice-card py-2 px-3 text-sm rounded-lg" onclick="selectSingleChoice(this, 6)">Clean & minimal</div>
+                            <div class="choice-card py-2 px-3 text-sm rounded-lg" onclick="selectSingleChoice(this, 6)">Fast-paced / viral style</div>
+                            <div class="choice-card py-2 px-3 text-sm rounded-lg" onclick="selectSingleChoice(this, 6)">Cinematic / premium</div>
+                            <div class="choice-card py-2 px-3 text-sm rounded-lg" onclick="selectSingleChoice(this, 6)">Not sure (need guidance)</div>
+                        </div>
+                    </div>
+
+                    <div class="step-content flex-col space-y-2" data-step="7">
+                        <span class="text-zinc-600 font-medium tracking-widest uppercase text-[10px] md:text-xs">07 — Name</span>
+                        <h1 class="text-xl md:text-2xl font-light leading-tight">What's your good name?</h1>
+                        <input type="text" id="nameInput" class="input-underline !py-1 !text-lg" placeholder="Type your answer here..." autocomplete="off" oninput="validateInput(this, 7)">
+                        <button type="button" onclick="nextStep()" class="bg-white text-black px-6 py-2 text-sm rounded-full font-semibold w-fit hover:bg-zinc-200 transition mt-2 opacity-50 cursor-not-allowed pointer-events-none" id="btn-next-7">Next Step →</button>
+                    </div>
+
+                    <div class="step-content flex-col space-y-2" data-step="8">
+                        <span class="text-zinc-600 font-medium tracking-widest uppercase text-[10px] md:text-xs">08 — Contact</span>
+                        <h1 class="text-xl md:text-2xl font-light leading-tight">Lastly, what's your Gmail?</h1>
+                        <input type="email" id="emailInput" class="input-underline !py-1 !text-lg" placeholder="name@gmail.com" autocomplete="off" oninput="validateEmail(this, 8)">
+                        <button type="button" onclick="finishQualification()" class="bg-white text-black px-6 py-2 text-sm rounded-full font-semibold w-fit hover:bg-zinc-200 transition mt-2 opacity-50 cursor-not-allowed pointer-events-none" id="btn-next-8">Confirm & Schedule</button>
+                    </div>
+                </form>
+            </div> class="choice-card p-3 text-sm rounded-lg flex flex-col items-start gap-2" onclick="selectOtherChoice(this, 5)">
                                 <span>Other</span>
                                 <input type="text" class="input-underline text-sm hidden !py-1" placeholder="Optional short text..." onclick="event.stopPropagation()" oninput="validateOther(this, 5)">
                             </div>
