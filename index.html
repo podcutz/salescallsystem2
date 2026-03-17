@@ -125,46 +125,94 @@
             <div class="flex-grow flex flex-col justify-center max-w-lg mx-auto w-full">
                 <form id="leadForm">
                     <div class="step-content active flex-col space-y-6" data-step="1">
-                        <span class="text-zinc-600 font-medium tracking-widest uppercase text-xs">01 — Identification</span>
-                        <h1 class="text-3xl md:text-4xl font-light leading-tight">What's your full name?</h1>
-                        <input type="text" id="nameInput" class="input-underline" placeholder="Type your answer here..." autocomplete="off">
-                        <button type="button" onclick="nextStep()" class="bg-white text-black px-8 py-3 rounded-full font-semibold w-fit hover:bg-zinc-200 transition mt-4">Next Step ↵</button>
+                        <span class="text-zinc-600 font-medium tracking-widest uppercase text-xs">01 — Identity</span>
+                        <h1 class="text-3xl md:text-4xl font-light leading-tight">Which best describes you?</h1>
+                        <div class="grid grid-cols-1 gap-3 pt-4" id="q1-options">
+                            <div class="choice-card p-4 rounded-lg" onclick="selectSingleChoice(this, 1)">Content Creator</div>
+                            <div class="choice-card p-4 rounded-lg" onclick="selectSingleChoice(this, 1)">Business / Brand</div>
+                            <div class="choice-card p-4 rounded-lg" onclick="selectSingleChoice(this, 1)">Agency</div>
+                            <div class="choice-card p-4 rounded-lg" onclick="selectSingleChoice(this, 1)">Influencer</div>
+                            <div class="choice-card p-4 rounded-lg flex flex-col items-start gap-2" onclick="selectOtherChoice(this, 1)">
+                                <span>Other</span>
+                                <input type="text" class="input-underline text-sm hidden" placeholder="Type here..." onclick="event.stopPropagation()" oninput="validateOther(this, 1)">
+                            </div>
+                        </div>
+                        <button type="button" onclick="nextStep()" class="bg-white text-black px-8 py-3 rounded-full font-semibold w-fit hover:bg-zinc-200 transition mt-4 opacity-50 cursor-not-allowed pointer-events-none" id="btn-next-1">Next Step →</button>
                     </div>
 
                     <div class="step-content flex-col space-y-6" data-step="2">
-                        <span class="text-zinc-600 font-medium tracking-widest uppercase text-xs">02 — Objective</span>
-                        <h1 class="text-3xl md:text-4xl font-light leading-tight">What is your primary goal?</h1>
-                        <div class="grid grid-cols-1 gap-3 pt-4">
-                            <div class="choice-card p-4 rounded-lg flex items-center space-x-4" onclick="selectChoice(this)">
-                                <span class="border border-zinc-700 px-2 py-1 rounded text-xs opacity-50">A</span>
-                                <span>Scaling Operations</span>
-                            </div>
-                            <div class="choice-card p-4 rounded-lg flex items-center space-x-4" onclick="selectChoice(this)">
-                                <span class="border border-zinc-700 px-2 py-1 rounded text-xs opacity-50">B</span>
-                                <span>Improving Conversion Rate</span>
-                            </div>
-                            <div class="choice-card p-4 rounded-lg flex items-center space-x-4" onclick="selectChoice(this)">
-                                <span class="border border-zinc-700 px-2 py-1 rounded text-xs opacity-50">C</span>
-                                <span>Automating Marketing</span>
-                            </div>
+                        <span class="text-zinc-600 font-medium tracking-widest uppercase text-xs">02 — Platform</span>
+                        <h1 class="text-3xl md:text-4xl font-light leading-tight">Where do you mainly post content? <span class="text-sm text-zinc-500 block mt-2">(Select multiple)</span></h1>
+                        <div class="grid grid-cols-1 gap-3 pt-4" id="q2-options">
+                            <div class="choice-card p-4 rounded-lg" onclick="toggleMultiChoice(this, 2)">Instagram</div>
+                            <div class="choice-card p-4 rounded-lg" onclick="toggleMultiChoice(this, 2)">TikTok</div>
+                            <div class="choice-card p-4 rounded-lg" onclick="toggleMultiChoice(this, 2)">YouTube</div>
+                            <div class="choice-card p-4 rounded-lg" onclick="toggleMultiChoice(this, 2)">LinkedIn</div>
                         </div>
+                        <button type="button" onclick="nextStep()" class="bg-white text-black px-8 py-3 rounded-full font-semibold w-fit hover:bg-zinc-200 transition mt-4 opacity-50 cursor-not-allowed pointer-events-none" id="btn-next-2">Next Step →</button>
                     </div>
 
                     <div class="step-content flex-col space-y-6" data-step="3">
-                        <span class="text-zinc-600 font-medium tracking-widest uppercase text-xs">03 — Investment</span>
-                        <h1 class="text-3xl md:text-4xl font-light leading-tight">Monthly budget for growth?</h1>
-                        <div class="grid grid-cols-1 gap-3 pt-4">
-                            <div class="choice-card p-4 rounded-lg" onclick="selectChoice(this)">$1k - $5k</div>
-                            <div class="choice-card p-4 rounded-lg" onclick="selectChoice(this)">$5k - $20k</div>
-                            <div class="choice-card p-4 rounded-lg" onclick="selectChoice(this)">$20k+</div>
+                        <span class="text-zinc-600 font-medium tracking-widest uppercase text-xs">03 — Content Type</span>
+                        <h1 class="text-3xl md:text-4xl font-light leading-tight">What kind of content do you create? <span class="text-sm text-zinc-500 block mt-2">(Select multiple)</span></h1>
+                        <div class="grid grid-cols-1 gap-3 pt-4" id="q3-options">
+                            <div class="choice-card p-4 rounded-lg" onclick="toggleMultiChoice(this, 3)">Podcasts / interviews</div>
+                            <div class="choice-card p-4 rounded-lg" onclick="toggleMultiChoice(this, 3)">Youtube Videos</div>
+                            <div class="choice-card p-4 rounded-lg" onclick="toggleMultiChoice(this, 3)">Reels / short-form</div>
+                            <div class="choice-card p-4 rounded-lg" onclick="toggleMultiChoice(this, 3)">Ads / promotional</div>
                         </div>
+                        <button type="button" onclick="nextStep()" class="bg-white text-black px-8 py-3 rounded-full font-semibold w-fit hover:bg-zinc-200 transition mt-4 opacity-50 cursor-not-allowed pointer-events-none" id="btn-next-3">Next Step →</button>
                     </div>
 
                     <div class="step-content flex-col space-y-6" data-step="4">
-                        <span class="text-zinc-600 font-medium tracking-widest uppercase text-xs">04 — Contact</span>
-                        <h1 class="text-3xl md:text-4xl font-light leading-tight">Lastly, what's your best email address?</h1>
-                        <input type="email" id="emailInput" class="input-underline" placeholder="name@example.com" autocomplete="off">
-                        <button type="button" onclick="finishQualification()" class="bg-white text-black px-8 py-3 rounded-full font-semibold w-fit hover:bg-zinc-200 transition mt-4">Confirm & Schedule</button>
+                        <span class="text-zinc-600 font-medium tracking-widest uppercase text-xs">04 — Volume</span>
+                        <h1 class="text-3xl md:text-4xl font-light leading-tight">How much content do you make?</h1>
+                        <div class="grid grid-cols-1 gap-3 pt-4" id="q4-options">
+                            <div class="choice-card p-4 rounded-lg" onclick="selectSingleChoice(this, 4)">1–5 videos/month</div>
+                            <div class="choice-card p-4 rounded-lg" onclick="selectSingleChoice(this, 4)">5–15 videos/month</div>
+                            <div class="choice-card p-4 rounded-lg" onclick="selectSingleChoice(this, 4)">15+ videos/month</div>
+                        </div>
+                    </div>
+
+                    <div class="step-content flex-col space-y-6" data-step="5">
+                        <span class="text-zinc-600 font-medium tracking-widest uppercase text-xs">05 — Pain Points</span>
+                        <h1 class="text-3xl md:text-4xl font-light leading-tight">What’s the biggest problem with your content right now?</h1>
+                        <div class="grid grid-cols-1 gap-3 pt-4" id="q5-options">
+                            <div class="choice-card p-4 rounded-lg" onclick="selectSingleChoice(this, 5)">Takes too long to edit</div>
+                            <div class="choice-card p-4 rounded-lg" onclick="selectSingleChoice(this, 5)">Doesn’t look professional</div>
+                            <div class="choice-card p-4 rounded-lg" onclick="selectSingleChoice(this, 5)">Not getting engagement</div>
+                            <div class="choice-card p-4 rounded-lg" onclick="selectSingleChoice(this, 5)">Inconsistent posting</div>
+                            <div class="choice-card p-4 rounded-lg flex flex-col items-start gap-2" onclick="selectOtherChoice(this, 5)">
+                                <span>Other</span>
+                                <input type="text" class="input-underline text-sm hidden" placeholder="Optional short text..." onclick="event.stopPropagation()" oninput="validateOther(this, 5)">
+                            </div>
+                        </div>
+                        <button type="button" onclick="nextStep()" class="bg-white text-black px-8 py-3 rounded-full font-semibold w-fit hover:bg-zinc-200 transition mt-4 opacity-50 cursor-not-allowed pointer-events-none" id="btn-next-5">Next Step →</button>
+                    </div>
+
+                    <div class="step-content flex-col space-y-6" data-step="6">
+                        <span class="text-zinc-600 font-medium tracking-widest uppercase text-xs">06 — Style</span>
+                        <h1 class="text-3xl md:text-4xl font-light leading-tight">What kind of editing style do you prefer?</h1>
+                        <div class="grid grid-cols-1 gap-3 pt-4" id="q6-options">
+                            <div class="choice-card p-4 rounded-lg" onclick="selectSingleChoice(this, 6)">Clean & minimal</div>
+                            <div class="choice-card p-4 rounded-lg" onclick="selectSingleChoice(this, 6)">Fast-paced / viral style</div>
+                            <div class="choice-card p-4 rounded-lg" onclick="selectSingleChoice(this, 6)">Cinematic / premium</div>
+                            <div class="choice-card p-4 rounded-lg" onclick="selectSingleChoice(this, 6)">Not sure (need guidance)</div>
+                        </div>
+                    </div>
+
+                    <div class="step-content flex-col space-y-6" data-step="7">
+                        <span class="text-zinc-600 font-medium tracking-widest uppercase text-xs">07 — Name</span>
+                        <h1 class="text-3xl md:text-4xl font-light leading-tight">What's your good name?</h1>
+                        <input type="text" id="nameInput" class="input-underline" placeholder="Type your answer here..." autocomplete="off" oninput="validateInput(this, 7)">
+                        <button type="button" onclick="nextStep()" class="bg-white text-black px-8 py-3 rounded-full font-semibold w-fit hover:bg-zinc-200 transition mt-4 opacity-50 cursor-not-allowed pointer-events-none" id="btn-next-7">Next Step →</button>
+                    </div>
+
+                    <div class="step-content flex-col space-y-6" data-step="8">
+                        <span class="text-zinc-600 font-medium tracking-widest uppercase text-xs">08 — Contact</span>
+                        <h1 class="text-3xl md:text-4xl font-light leading-tight">Lastly, what's your Gmail?</h1>
+                        <input type="email" id="emailInput" class="input-underline" placeholder="name@gmail.com" autocomplete="off" oninput="validateEmail(this, 8)">
+                        <button type="button" onclick="finishQualification()" class="bg-white text-black px-8 py-3 rounded-full font-semibold w-fit hover:bg-zinc-200 transition mt-4 opacity-50 cursor-not-allowed pointer-events-none" id="btn-next-8">Confirm & Schedule</button>
                     </div>
                 </form>
             </div>
@@ -173,7 +221,7 @@
                 <button onclick="prevStep()" class="bg-zinc-950 p-4 rounded-l-lg hover:bg-zinc-900 border border-zinc-800 transition">
                     <svg width="14" height="14" viewBox="0 0 12 12" fill="white"><path d="M6 1l-5 5 5 5V1z"/></svg>
                 </button>
-                <button onclick="nextStep()" class="bg-zinc-950 p-4 rounded-r-lg hover:bg-zinc-900 border border-zinc-800 border-l-0 transition">
+                <button onclick="nextStep()" id="nextChevron" class="bg-zinc-950 p-4 rounded-r-lg hover:bg-zinc-900 border border-zinc-800 border-l-0 transition opacity-30 pointer-events-none">
                     <svg width="14" height="14" viewBox="0 0 12 12" fill="white"><path d="M6 1l5 5-5 5V1z"/></svg>
                 </button>
             </div>
@@ -182,23 +230,21 @@
         <div id="rightPanel" class="hidden lg:flex w-1/2 h-full bg-black items-center justify-center p-20 relative transition-all duration-700">
             <div class="absolute left-0 top-1/4 bottom-1/4 w-[1px] bg-gradient-to-b from-transparent via-zinc-800 to-transparent" id="dividerLine"></div>
             <div id="logoContainer" class="flex flex-col items-center transition-all duration-700 w-full">
-                <img src="https://res.cloudinary.com/dobnqmfsg/image/upload/v1770995309/Screenshot_2026-02-13_151541-removebg-preview_ifdgq3.png" 
+                <img src="https://res.cloudinary.com/dobnqmfsg/image/upload/v1772612374/Untitled_design__1_-removebg-preview_ux1end.png" 
                      alt="Logo" 
                      id="mainLogo"
-                     class="w-full max-w-sm h-auto object-contain opacity-90 drop-shadow-[0_0_15px_rgba(255,255,255,0.05)] transition-all duration-700">
+                     class="w-full max-w-[280px] h-auto object-contain opacity-90 drop-shadow-[0_0_15px_rgba(255,255,255,0.05)] transition-all duration-700">
             </div>
         </div>
     </div>
 
     <!-- Step 5: Full Screen Booking Interface -->
     <div id="bookingInterface" class="hidden fixed inset-0 z-40 bg-black flex-col items-center p-8 overflow-y-auto animate-fade-in">
-        <div id="topLogoAnchor" class="w-24 mt-4 mb-12 flex justify-center"></div>
+<div id="topLogoAnchor" class="w-24 mt-4 mb-6 flex justify-center"></div>
 
-        <!-- Layout Container: Flex row on larger screens -->
-        <div class="flex flex-col md:flex-row items-start justify-center w-full max-w-5xl mx-auto">
+        <div class="flex flex-col md:flex-row items-start justify-center w-full max-w-5xl mx-auto gap-6 relative mt-2">
             
-            <!-- Calendar Side -->
-            <div class="w-full max-w-md bg-zinc-950/50 p-8 rounded-3xl border border-zinc-900/50">
+            <div class="w-full max-w-md bg-zinc-950/50 p-8 rounded-3xl border border-zinc-900/50 mt-[48px]">
                 <div class="mb-8">
                     <h1 class="text-2xl font-light">Select a Date</h1>
                     <p class="text-zinc-500 text-sm mt-1">Available strategy sessions.</p>
@@ -217,15 +263,18 @@
                 <div class="grid grid-cols-7 gap-2" id="calendarGrid"></div>
             </div>
 
-            <!-- Time Slots Side (Aligned right beside calendar on desktop) -->
-            <div id="timeSlotsContainer" class="w-full flex flex-col">
+            <div id="timeSlotsContainer" class="w-full flex flex-col relative">
+                <div class="h-[48px] w-full relative mb-0 flex items-end">
+                    <div id="bookNowBtnContainer" class="hidden absolute bottom-2 left-0">
+                        <button onclick="confirmBooking()" class="bg-white text-black px-8 py-2.5 rounded-full font-semibold w-fit hover:bg-zinc-200 transition text-sm">Book Now →</button>
+                    </div>
+                </div>
                 <div class="mb-6">
-                    <h3 id="selectedDateLabel" class="text-zinc-400 font-medium">Friday, March 15</h3>
+                    <h3 id="selectedDateLabel" class="text-zinc-400 font-medium text-2xl font-light text-white">Select Date = March 19, 2024</h3>
                     <p class="text-zinc-600 text-[10px] tracking-widest uppercase mt-1">Select an available slot (GMT)</p>
                 </div>
                 <div class="space-y-2 max-h-[420px] overflow-y-auto pr-2" id="timeSlotsList">
-                    <!-- Filled via JS -->
-                </div>
+                    </div>
             </div>
         </div>
         <div class="h-20"></div> <!-- Spacer -->
@@ -244,12 +293,13 @@
     </div>
 
     <script>
-        let currentStep = 1;
-        const totalSteps = 4;
+       let currentStep = 1;
+        const totalSteps = 8;
+        let selectedTimeSlot = null;
 
         function updateProgress() {
-            const percentage = (currentStep / totalSteps) * 100;
-            document.getElementById('progressBar').style.width = percentage + '%';
+            const percentage = ((currentStep - 1) / totalSteps) * 100;
+            document.getElementById('progressBar').style.width = (percentage === 0 ? 5 : percentage) + '%';
         }
 
         function showStep(step) {
@@ -257,10 +307,11 @@
             const activeStep = document.querySelector(`[data-step="${step}"]`);
             if (activeStep) activeStep.classList.add('active');
             updateProgress();
+            checkValidation(step);
         }
 
         function nextStep() {
-            if (currentStep < totalSteps) {
+            if (isStepValid(currentStep) && currentStep < totalSteps) {
                 currentStep++;
                 showStep(currentStep);
             }
@@ -273,14 +324,102 @@
             }
         }
 
-        function selectChoice(element) {
-            const parent = element.parentElement;
-            parent.querySelectorAll('.choice-card').forEach(card => card.classList.remove('selected'));
-            element.classList.add('selected');
-            setTimeout(nextStep, 500);
+        // --- Core Validation Logic ---
+        function isStepValid(step) {
+            const stepEl = document.querySelector(`[data-step="${step}"]`);
+            if (!stepEl) return false;
+            
+            if ([1, 4, 5, 6].includes(step)) {
+                const selected = stepEl.querySelector('.choice-card.selected');
+                if (!selected) return false;
+                const input = selected.querySelector('input');
+                // Ensure typed "Other" is valid if selected
+                if (input && !input.classList.contains('hidden')) {
+                    if (step === 1 && input.value.trim() === '') return false;
+                }
+                return true;
+            }
+            if (step === 2 || step === 3) {
+                return stepEl.querySelectorAll('.choice-card.selected').length > 0;
+            }
+            if (step === 7) {
+                return document.getElementById('nameInput').value.trim().length > 1;
+            }
+            if (step === 8) {
+                const email = document.getElementById('emailInput').value.trim();
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return emailRegex.test(email);
+            }
+            return false;
         }
 
+        function enableNextButton(step) {
+            const btn = document.getElementById(`btn-next-${step}`);
+            if (btn) btn.classList.remove('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
+        }
+
+        function disableNextButton(step) {
+            const btn = document.getElementById(`btn-next-${step}`);
+            if (btn) btn.classList.add('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
+        }
+
+        function checkValidation(step) {
+            if (isStepValid(step)) enableNextButton(step);
+            else disableNextButton(step);
+            
+            // Sync with Right Chevron
+            const nextChevron = document.getElementById('nextChevron');
+            if (nextChevron) {
+                if (isStepValid(step)) {
+                    nextChevron.style.opacity = '1';
+                    nextChevron.style.pointerEvents = 'auto';
+                } else {
+                    nextChevron.style.opacity = '0.3';
+                    nextChevron.style.pointerEvents = 'none';
+                }
+            }
+        }
+
+        // --- Handlers for Options ---
+        function selectSingleChoice(element, step) {
+            const parent = element.closest('.grid');
+            parent.querySelectorAll('.choice-card').forEach(card => {
+                card.classList.remove('selected');
+                const input = card.querySelector('input');
+                if(input) input.classList.add('hidden');
+            });
+            element.classList.add('selected');
+            checkValidation(step);
+            if (step !== 1 && step !== 5) {
+                setTimeout(nextStep, 500); // Auto-advance for basic clicks
+            }
+        }
+
+        function selectOtherChoice(element, step) {
+            const parent = element.closest('.grid');
+            parent.querySelectorAll('.choice-card').forEach(card => {
+                card.classList.remove('selected');
+                const input = card.querySelector('input');
+                if(input && card !== element) input.classList.add('hidden');
+            });
+            element.classList.add('selected');
+            const input = element.querySelector('input');
+            input.classList.remove('hidden');
+            input.focus();
+            checkValidation(step);
+        }
+
+        function toggleMultiChoice(element, step) {
+            element.classList.toggle('selected');
+            checkValidation(step);
+        }
+
+        function validateOther(input, step) { checkValidation(step); }
+        function validateInput(input, step) { checkValidation(step); }
+        function validateEmail(input, step) { checkValidation(step); }
+
         function finishQualification() {
+            if(!isStepValid(8)) return;
             const leftPanel = document.getElementById('leftPanel');
             const rightPanel = document.getElementById('rightPanel');
             const divider = document.getElementById('dividerLine');
@@ -289,7 +428,7 @@
             leftPanel.style.opacity = '0';
             divider.style.opacity = '0';
             
-            logo.classList.replace('max-w-sm', 'max-w-[100px]');
+            logo.classList.replace('max-w-[280px]', 'max-w-[100px]');
             rightPanel.classList.remove('lg:w-1/2');
             rightPanel.classList.add('w-full', 'items-start', 'pt-12');
             
@@ -320,9 +459,13 @@
                     day.onclick = () => {
                         document.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('selected'));
                         day.classList.add('selected');
-                        document.getElementById('selectedDateLabel').innerText = `March ${i}, 2024`;
+                        document.getElementById('selectedDateLabel').innerText = `Select Date = March ${i}, 2024`;
                         renderTimeSlots();
                         document.getElementById('timeSlotsContainer').classList.add('open');
+                        
+                        // Hide book now button when changing date
+                        document.getElementById('bookNowBtnContainer').classList.add('hidden');
+                        selectedTimeSlot = null;
                     };
                 }
                 grid.appendChild(day);
@@ -333,14 +476,12 @@
             const list = document.getElementById('timeSlotsList');
             list.innerHTML = '';
             
-            // 10:00 AM to 6:00 PM in 30min intervals
             let hour = 10;
             let minutes = 0;
             
             while (hour < 18) {
                 const startTime = formatTime(hour, minutes);
                 
-                // Advance by 30 mins
                 let endHour = hour;
                 let endMinutes = minutes + 30;
                 if (endMinutes === 60) {
@@ -352,12 +493,12 @@
                 const ampm = endHour >= 12 ? 'pm' : 'am';
                 
                 const slotBtn = document.createElement('button');
-                slotBtn.className = "w-full py-4 rounded-xl border border-zinc-900 bg-zinc-950/50 hover:border-white transition group flex justify-between px-6 items-center mb-2";
+                slotBtn.className = "time-slot-btn w-full py-4 rounded-xl border border-zinc-900 bg-zinc-950/50 hover:border-white transition group flex justify-between px-6 items-center mb-2";
                 slotBtn.innerHTML = `
                     <span class="text-sm font-medium tracking-tight">${startTime}-${endTime} ${ampm} (GMT)</span>
                     <span class="text-[10px] uppercase tracking-widest text-zinc-600 group-hover:text-white transition">Select →</span>
                 `;
-                slotBtn.onclick = confirmBooking;
+                slotBtn.onclick = (e) => selectTimeSlot(slotBtn, e);
                 list.appendChild(slotBtn);
                 
                 hour = endHour;
@@ -370,6 +511,20 @@
             let displayM = m === 0 ? "00" : m;
             return `${displayH}:${displayM}`;
         }
+        
+        function selectTimeSlot(btn, e) {
+            document.querySelectorAll('.time-slot-btn').forEach(b => {
+                b.classList.remove('border-white', 'bg-white', 'text-black');
+                b.querySelector('span:last-child').classList.remove('text-black');
+                b.querySelector('span:last-child').innerText = 'Select →';
+            });
+            btn.classList.add('border-white', 'bg-white', 'text-black');
+            btn.querySelector('span:last-child').classList.add('text-black');
+            btn.querySelector('span:last-child').innerText = 'Selected';
+            
+            selectedTimeSlot = btn;
+            document.getElementById('bookNowBtnContainer').classList.remove('hidden');
+        }
 
         function confirmBooking() {
             document.getElementById('bookingInterface').classList.add('hidden');
@@ -378,14 +533,22 @@
             document.getElementById('progressBar').classList.add('opacity-0');
         }
 
+        // Global keypress (Only advances if field is valid!)
         document.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 if (document.getElementById('bookingInterface').classList.contains('hidden')) {
-                    if (currentStep === totalSteps) finishQualification();
-                    else nextStep();
+                    if (isStepValid(currentStep)) {
+                        if (currentStep === totalSteps) finishQualification();
+                        else nextStep();
+                    }
                 }
             }
+        });
+        
+        // Initialize logic map
+        document.addEventListener('DOMContentLoaded', () => {
+            showStep(1);
         });
     </script>
 </body>
