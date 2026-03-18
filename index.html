@@ -5,9 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lead Qualification & Booking</title>
     <script src="https://cdn.tailwindcss.com"></script>
-<script src="https://unpkg.com/lucide@latest"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4/build/global/luxon.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #000; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+        
+        /* Exact Calendar CSS from callbookn8n */
+        .booking-calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+        .booking-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; cursor: pointer; border: 1px solid transparent; transition: all 0.2s; border-radius: 6px; }
+        .booking-day:hover:not(.empty) { background: rgba(255,255,255,0.1); }
+        .booking-day.selected { background: white; color: black; font-weight: bold; }
+        .booking-day.empty { pointer-events: none; }
+        .booking-day.disabled { opacity: 0.2; cursor: not-allowed; pointer-events: none; }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
 
@@ -141,10 +153,10 @@
                         <span class="text-zinc-600 font-medium tracking-widest uppercase text-[10px] md:text-xs">01 — Identity</span>
                         <h1 class="text-2xl md:text-3xl font-light leading-tight">Which best describes you?</h1>
                         <div class="grid grid-cols-1 gap-2 pt-1" id="q1-options">
-                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="event.stopPropagation(); selectSingleChoice(this, 1)">Content Creator</div>
-<div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="event.stopPropagation(); selectSingleChoice(this, 1)">Business / Brand</div>
-<div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="event.stopPropagation(); selectSingleChoice(this, 1)">Agency</div>
-<div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="event.stopPropagation(); selectSingleChoice(this, 1)">Influencer</div>
+                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="selectSingleChoice(this, 1)">Content Creator</div>
+                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="selectSingleChoice(this, 1)">Business / Brand</div>
+                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="selectSingleChoice(this, 1)">Agency</div>
+                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="selectSingleChoice(this, 1)">Influencer</div>
                             <div class="choice-card py-2.5 px-4 text-sm rounded-lg flex flex-col items-start gap-1.5" onclick="selectOtherChoice(this, 1)">
                                 <span>Other</span>
                                 <input type="text" class="input-underline text-sm hidden !py-1" placeholder="Type here..." onclick="event.stopPropagation()" oninput="validateOther(this, 1)">
@@ -178,24 +190,23 @@
                     </div>
 
                     <div class="step-content flex-col space-y-4" data-step="4">
-    <span class="text-zinc-600 font-medium tracking-widest uppercase text-[10px] md:text-xs">04 — Volume</span>
-    <h1 class="text-2xl md:text-3xl font-light leading-tight">How much content do you make?</h1>
-    <div class="grid grid-cols-1 gap-2 pt-1" id="q4-options">
-        <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="event.stopPropagation(); selectSingleChoice(this, 4)">1–5 videos/month</div>
-        <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="event.stopPropagation(); selectSingleChoice(this, 4)">5–15 videos/month</div>
-        <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="event.stopPropagation(); selectSingleChoice(this, 4)">15+ videos/month</div>
-    </div>
-    <button type="button" onclick="nextStep()" class="bg-white text-black px-6 py-2.5 text-sm rounded-full font-semibold w-fit hover:bg-zinc-200 transition mt-3 opacity-50 cursor-not-allowed pointer-events-none" id="btn-next-4">Next Step →</button>
-</div>
+                        <span class="text-zinc-600 font-medium tracking-widest uppercase text-[10px] md:text-xs">04 — Volume</span>
+                        <h1 class="text-2xl md:text-3xl font-light leading-tight">How much content do you make?</h1>
+                        <div class="grid grid-cols-1 gap-2 pt-1" id="q4-options">
+                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="selectSingleChoice(this, 4)">1–5 videos/month</div>
+                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="selectSingleChoice(this, 4)">5–15 videos/month</div>
+                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="selectSingleChoice(this, 4)">15+ videos/month</div>
+                        </div>
+                    </div>
 
                     <div class="step-content flex-col space-y-4" data-step="5">
                         <span class="text-zinc-600 font-medium tracking-widest uppercase text-[10px] md:text-xs">05 — Pain Points</span>
                         <h1 class="text-2xl md:text-3xl font-light leading-tight">What’s the biggest problem with your content right now?</h1>
                         <div class="grid grid-cols-1 gap-2 pt-1" id="q5-options">
-                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="event.stopPropagation(); selectSingleChoice(this, 5)">Takes too long to edit</div>
-<div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="event.stopPropagation(); selectSingleChoice(this, 5)">Doesn’t look professional</div>
-<div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="event.stopPropagation(); selectSingleChoice(this, 5)">Not getting engagement</div>
-<div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="event.stopPropagation(); selectSingleChoice(this, 5)">Inconsistent posting</div>
+                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="selectSingleChoice(this, 5)">Takes too long to edit</div>
+                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="selectSingleChoice(this, 5)">Doesn’t look professional</div>
+                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="selectSingleChoice(this, 5)">Not getting engagement</div>
+                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="selectSingleChoice(this, 5)">Inconsistent posting</div>
                             <div class="choice-card py-2.5 px-4 text-sm rounded-lg flex flex-col items-start gap-1.5" onclick="selectOtherChoice(this, 5)">
                                 <span>Other</span>
                                 <input type="text" class="input-underline text-sm hidden !py-1" placeholder="Optional short text..." onclick="event.stopPropagation()" oninput="validateOther(this, 5)">
@@ -208,10 +219,10 @@
                         <span class="text-zinc-600 font-medium tracking-widest uppercase text-[10px] md:text-xs">06 — Style</span>
                         <h1 class="text-2xl md:text-3xl font-light leading-tight">What kind of editing style do you prefer?</h1>
                         <div class="grid grid-cols-1 gap-2 pt-1" id="q6-options">
-                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="event.stopPropagation(); selectSingleChoice(this, 6)">Clean & minimal</div>
-<div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="event.stopPropagation(); selectSingleChoice(this, 6)">Fast-paced / viral style</div>
-<div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="event.stopPropagation(); selectSingleChoice(this, 6)">Cinematic / premium</div>
-<div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="event.stopPropagation(); selectSingleChoice(this, 6)">Not sure (need guidance)</div>
+                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="selectSingleChoice(this, 6)">Clean & minimal</div>
+                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="selectSingleChoice(this, 6)">Fast-paced / viral style</div>
+                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="selectSingleChoice(this, 6)">Cinematic / premium</div>
+                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="selectSingleChoice(this, 6)">Not sure (need guidance)</div>
                         </div>
                     </div>
 
@@ -219,10 +230,10 @@
                         <span class="text-zinc-600 font-medium tracking-widest uppercase text-[10px] md:text-xs">07 — Budget</span>
                         <h1 class="text-2xl md:text-3xl font-light leading-tight">What is your budget?</h1>
                         <div class="grid grid-cols-1 gap-2 pt-1" id="q7-options">
-                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="event.stopPropagation(); selectSingleChoice(this, 7)">$500-$2,000/monthly</div>
-<div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="event.stopPropagation(); selectSingleChoice(this, 7)">$2,000-$3,000/monthly</div>
-<div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="event.stopPropagation(); selectSingleChoice(this, 7)">$3,000-$4,000/monthly</div>
-<div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="event.stopPropagation(); selectSingleChoice(this, 7)">$4,000-$5,000/monthly</div>
+                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="selectSingleChoice(this, 7)">$500-$2,000/monthly</div>
+                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="selectSingleChoice(this, 7)">$2,000-$3,000/monthly</div>
+                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="selectSingleChoice(this, 7)">$3,000-$4,000/monthly</div>
+                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="selectSingleChoice(this, 7)">$4,000-$5,000/monthly</div>
                         </div>
                     </div>
 
@@ -269,23 +280,37 @@
 
         <div class="flex flex-col md:flex-row items-start justify-center w-full max-w-5xl mx-auto gap-6 relative mt-0">
             
-            <div class="w-full max-w-md bg-zinc-950/50 p-8 rounded-3xl border border-zinc-900/50">
-                <div class="mb-8">
-                    <h1 class="text-2xl font-light">Select a Date</h1>
-                    <p class="text-zinc-500 text-sm mt-1">Available strategy sessions.</p>
-                </div>
-                
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="font-medium text-zinc-300">March 2024</h2>
-                    <div class="flex space-x-1">
-                        <button class="p-2 hover:bg-zinc-800 rounded-full transition"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></button>
-                        <button class="p-2 hover:bg-zinc-800 rounded-full transition"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></button>
+            <div class="w-full max-w-md bg-[#050505] p-8 rounded-2xl border border-white/10 shadow-2xl">
+                <div class="mb-8 flex justify-between items-center relative z-[5000]">
+                    <h1 class="text-xl font-bold uppercase tracking-widest text-white">Select Date</h1>
+                    <div class="relative w-48">
+                        <div id="tz-dropdown-btn" onclick="toggleTzDropdown()" class="bg-zinc-900 border border-white/10 rounded-full px-4 py-2 flex items-center justify-between shadow-[0_0_20px_rgba(255,255,255,0.05)] cursor-pointer w-full group hover:border-white/30 transition-all">
+                            <div class="flex items-center space-x-2 overflow-hidden w-full">
+                                <i data-lucide="globe" class="w-3.5 h-3.5 text-white shrink-0"></i>
+                                <span id="tz-selected-text" class="text-[10px] text-white font-light tracking-wide truncate pointer-events-none w-full text-left">Loading...</span>
+                            </div>
+                            <i data-lucide="chevron-down" id="tz-chevron" class="w-3 h-3 text-white/40 ml-2 shrink-0 transition-transform duration-200 pointer-events-none"></i>
+                        </div>
+                        <div id="tz-dropdown-menu" class="hidden absolute top-full right-0 mt-2 w-64 bg-[#0a0a0a] border border-white/10 rounded-2xl shadow-2xl z-[6000] flex flex-col overflow-hidden">
+                            <div class="p-2 border-b border-white/10">
+                                <input type="text" id="tz-search" oninput="filterTimezones()" placeholder="Search city or timezone..." class="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-[10px] text-white font-light focus:outline-none focus:border-white/30 transition-colors">
+                            </div>
+                            <div id="tz-list" class="max-h-64 overflow-y-auto custom-scrollbar flex flex-col p-1 bg-black"></div>
+                        </div>
                     </div>
                 </div>
-                <div class="grid grid-cols-7 gap-1 text-center text-[10px] tracking-widest text-zinc-600 mb-4 uppercase font-semibold">
-                    <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+                
+                <div class="bg-white/[0.03] border border-white/10 rounded-xl p-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <button onclick="changeBookingMonth(-1)" class="p-1 hover:bg-white/10 rounded text-white/60 hover:text-white transition-colors"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+                        <h4 id="b-calendar-month-label" class="text-xs font-bold uppercase tracking-widest text-center text-white">Month Year</h4>
+                        <button onclick="changeBookingMonth(1)" class="p-1 hover:bg-white/10 rounded text-white/60 hover:text-white transition-colors"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+                    </div>
+                    <div class="booking-calendar-grid text-[10px] text-white/30 uppercase font-bold mb-2 text-center">
+                        <div>S</div><div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div>
+                    </div>
+                    <div id="b-calendar-days" class="booking-calendar-grid text-white"></div>
                 </div>
-                <div class="grid grid-cols-7 gap-2" id="calendarGrid"></div>
             </div>
 
             <div id="timeSlotsContainer" class="w-full flex flex-col relative pt-8">
@@ -294,27 +319,9 @@
                         <h3 id="selectedDateLabel" class="text-2xl font-light text-white">March 19, 2024</h3>
                         <p class="text-zinc-600 text-[10px] tracking-widest uppercase mt-1">Select an available slot (GMT)</p>
                     </div>
-                    <div class="flex items-center gap-4">
-    <div class="relative">
-        <div id="tz-dropdown-btn" onclick="toggleTzDropdown()" class="bg-zinc-900 border border-zinc-800 rounded-full px-4 py-2 flex items-center justify-between cursor-pointer min-w-[200px] hover:border-zinc-600 transition-all">
-            <div class="flex items-center space-x-2 overflow-hidden">
-                <i data-lucide="globe" class="w-3.5 h-3.5 text-zinc-400"></i>
-                <span id="tz-selected-text" class="text-[10px] text-white font-medium truncate">Loading...</span>
-            </div>
-            <i data-lucide="chevron-down" id="tz-chevron" class="w-3 h-3 text-zinc-500 ml-2 transition-transform"></i>
-        </div>
-        <div id="tz-dropdown-menu" class="hidden absolute top-full right-0 mt-2 w-64 bg-zinc-950 border border-zinc-800 rounded-2xl shadow-2xl z-[100] flex flex-col overflow-hidden">
-            <div class="p-2 border-b border-zinc-900">
-                <input type="text" id="tz-search" oninput="filterTimezones()" placeholder="Search city..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-[10px] text-white focus:outline-none focus:border-zinc-600">
-            </div>
-            <div id="tz-list" class="max-h-48 overflow-y-auto p-1 scrollbar-hide"></div>
-        </div>
-    </div>
-    
-    <div id="bookNowBtnContainer" class="hidden">
-        <button id="mainBookBtn" onclick="confirmBooking()" class="bg-white text-black px-6 py-2.5 rounded-full font-semibold w-fit hover:bg-zinc-200 transition text-sm shadow-lg">Book Now →</button>
-    </div>
-</div>
+                    <div id="bookNowBtnContainer" class="hidden">
+                        <button onclick="confirmBooking()" class="bg-white text-black px-6 py-2.5 rounded-full font-semibold w-fit hover:bg-zinc-200 transition text-sm shadow-lg">Book Now →</button>
+                    </div>
                 </div>
                 <div class="space-y-2 max-h-[420px] overflow-y-auto pr-2" id="timeSlotsList">
                 </div>
@@ -334,115 +341,50 @@
         <p class="text-zinc-500 max-w-md mx-auto leading-relaxed">We've sent a confirmation email with the meeting details. Our team is excited to help you scale.</p>
     </div>
 
-    <script>
-// 1. Initialize variables safely first so the UI never breaks
-const TARGET_ID = '44f4c4b7-73da-4659-8ffd-7ed180c34c0c'; // Your provided ID
-let currentStep = 1;
-const totalSteps = 9;
-let selectedTimeSlot = null;
-let userTz = 'UTC';
-try { userTz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'; } catch(e) {}
-let targetTz = 'UTC';
-let globalTimezones = [];
-let currentMonth = new Date().getMonth();
-let currentYear = new Date().getFullYear();
-
-// 2. Safely initialize Supabase to prevent ad-blocker UI crashes
-let supabase = null;
-try {
-    const SUPABASE_URL = 'https://ikeyqwtrqaqogecvxmiq.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJz...';
-
-    // Correct way for v2 CDN
-    if (window.supabase && window.supabase.createClient) {
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    }
-} catch (e) { 
-    console.warn("Database connection delayed/blocked", e); 
-}
-
-// Initialize Timezones
-function initTimezones() {
-            try {
-                if (typeof Intl !== 'undefined' && Intl.supportedValuesOf) {
-                    globalTimezones = Intl.supportedValuesOf('timeZone').map(tz => ({
-                        val: tz,
-                        label: tz.split('/').pop().replace(/_/g, ' ')
-                    }));
-                    renderTzList();
-                }
-                document.getElementById('tz-selected-text').innerText = userTz.split('/').pop().replace(/_/g, ' ');
-                if (typeof lucide !== 'undefined') lucide.createIcons();
-            } catch (error) {
-                console.warn("Timezone initialization safely skipped on this browser.", error);
-            }
-        }
-
-function renderTzList(filter = '') {
-    const list = document.getElementById('tz-list');
-    list.innerHTML = globalTimezones.filter(t => t.val.toLowerCase().includes(filter.toLowerCase()))
-        .map(t => `<div onclick="selectTz('${t.val}')" class="px-3 py-2 text-[10px] hover:bg-zinc-900 cursor-pointer rounded-lg">${t.label}</div>`).join('');
-}
-
-function selectTz(tz) {
-    userTz = tz;
-    document.getElementById('tz-selected-text').innerText = tz.split('/').pop().replace(/_/g, ' ');
-    toggleTzDropdown();
-    if (document.querySelector('.calendar-day.selected')) {
-        document.querySelector('.calendar-day.selected').click();
-    }
-}
-
-function toggleTzDropdown() {
-    const menu = document.getElementById('tz-dropdown-menu');
-    menu.classList.toggle('hidden');
-    document.getElementById('tz-chevron').style.transform = menu.classList.contains('hidden') ? 'rotate(0)' : 'rotate(180deg)';
-}
-
-        function updateProgress() {
-            const percentage = ((currentStep - 1) / totalSteps) * 100;
+<script>
+        window.currentStep = 1;
+        window.totalSteps = 9;
+        
+        window.updateProgress = function() {
+            const percentage = ((window.currentStep - 1) / window.totalSteps) * 100;
             document.getElementById('progressBar').style.width = (percentage === 0 ? 5 : percentage) + '%';
         }
 
-        function showStep(step) {
+        window.showStep = function(step) {
             document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
             const activeStep = document.querySelector(`[data-step="${step}"]`);
             if (activeStep) activeStep.classList.add('active');
-            updateProgress();
-            checkValidation(step);
+            window.updateProgress();
+            window.checkValidation(step);
         }
 
         window.nextStep = function() {
-            if (isStepValid(currentStep) && currentStep < totalSteps) {
-                currentStep++;
-                showStep(currentStep);
+            if (window.isStepValid(window.currentStep) && window.currentStep < window.totalSteps) {
+                window.currentStep++;
+                window.showStep(window.currentStep);
             }
         }
 
         window.prevStep = function() {
-            if (currentStep > 1) {
-                currentStep--;
-                showStep(currentStep);
+            if (window.currentStep > 1) {
+                window.currentStep--;
+                window.showStep(window.currentStep);
             }
         }
 
-        // --- Core Validation Logic ---
-        function isStepValid(step) {
+        window.isStepValid = function(step) {
             const stepEl = document.querySelector(`[data-step="${step}"]`);
             if (!stepEl) return false;
             
             if ([1, 4, 5, 6, 7].includes(step)) {
-    const selected = stepEl.querySelector('.choice-card.selected');
-    if (!selected) return false;
-
-    // Only validate input IF it actually exists AND is visible
-    const input = selected.querySelector('input');
-    if (input && !input.classList.contains('hidden')) {
-        if (input.value.trim() === '') return false;
-    }
-
-    return true;
-}
+                const selected = stepEl.querySelector('.choice-card.selected');
+                if (!selected) return false;
+                const input = selected.querySelector('input');
+                if (input && !input.classList.contains('hidden')) {
+                    if (step === 1 && input.value.trim() === '') return false;
+                }
+                return true;
+            }
             if (step === 2 || step === 3) {
                 return stepEl.querySelectorAll('.choice-card.selected').length > 0;
             }
@@ -457,24 +399,23 @@ function toggleTzDropdown() {
             return false;
         }
 
-        function enableNextButton(step) {
+        window.enableNextButton = function(step) {
             const btn = document.getElementById(`btn-next-${step}`);
             if (btn) btn.classList.remove('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
         }
 
-        function disableNextButton(step) {
+        window.disableNextButton = function(step) {
             const btn = document.getElementById(`btn-next-${step}`);
             if (btn) btn.classList.add('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
         }
 
-        function checkValidation(step) {
-            if (isStepValid(step)) enableNextButton(step);
-            else disableNextButton(step);
+        window.checkValidation = function(step) {
+            if (window.isStepValid(step)) window.enableNextButton(step);
+            else window.disableNextButton(step);
             
-            // Sync with Right Chevron
             const nextChevron = document.getElementById('nextChevron');
             if (nextChevron) {
-                if (isStepValid(step)) {
+                if (window.isStepValid(step)) {
                     nextChevron.style.opacity = '1';
                     nextChevron.style.pointerEvents = 'auto';
                 } else {
@@ -484,65 +425,45 @@ function toggleTzDropdown() {
             }
         }
 
-window.selectSingleChoice = function(element, step) {
-    const parent = element.closest('.grid');
-    if (!parent) return;
-
-    parent.querySelectorAll('.choice-card').forEach(card => {
-        card.classList.remove('selected');
-        const input = card.querySelector('input');
-        if (input) {
-            input.classList.add('hidden');
-            input.value = ''; 
+        window.selectSingleChoice = function(element, step) {
+            const parent = element.closest('.grid');
+            parent.querySelectorAll('.choice-card').forEach(card => {
+                card.classList.remove('selected');
+                const input = card.querySelector('input');
+                if(input) input.classList.add('hidden');
+            });
+            element.classList.add('selected');
+            window.checkValidation(step);
+            if (step !== 1 && step !== 5) {
+                setTimeout(window.nextStep, 500);
+            }
         }
-    });
-
-    element.classList.add('selected');
-
-    // Force validation AFTER DOM update
-    setTimeout(() => {
-        checkValidation(step);
-
-        // Only move forward if valid (prevents silent failure)
-        if (isStepValid(step)) {
-            nextStep();
-        }
-    }, 50);
-}
 
         window.selectOtherChoice = function(element, step) {
             const parent = element.closest('.grid');
-            if (!parent) return;
-
             parent.querySelectorAll('.choice-card').forEach(card => {
                 card.classList.remove('selected');
-                const otherInput = card.querySelector('input');
-                if (otherInput) {
-                    otherInput.classList.add('hidden');
-                }
+                const input = card.querySelector('input');
+                if(input && card !== element) input.classList.add('hidden');
             });
-
             element.classList.add('selected');
             const input = element.querySelector('input');
-            if (input) {
-                input.classList.remove('hidden');
-                // Added a small delay to focus to prevent layout shifts
-                setTimeout(() => input.focus(), 50); 
-            }
-            checkValidation(step);
+            input.classList.remove('hidden');
+            input.focus();
+            window.checkValidation(step);
         }
 
         window.toggleMultiChoice = function(element, step) {
             element.classList.toggle('selected');
-            checkValidation(step);
+            window.checkValidation(step);
         }
 
-        function validateOther(input, step) { checkValidation(step); }
-        function validateInput(input, step) { checkValidation(step); }
-        function validateEmail(input, step) { checkValidation(step); }
+        window.validateOther = function(input, step) { window.checkValidation(step); }
+        window.validateInput = function(input, step) { window.checkValidation(step); }
+        window.validateEmail = function(input, step) { window.checkValidation(step); }
 
-        function finishQualification() {
-            if(!isStepValid(9)) return;
+        window.finishQualification = function() {
+            if(!window.isStepValid(9)) return;
             const leftPanel = document.getElementById('leftPanel');
             const rightPanel = document.getElementById('rightPanel');
             const divider = document.getElementById('dividerLine');
@@ -560,200 +481,510 @@ window.selectSingleChoice = function(element, step) {
                 document.getElementById('bookingInterface').classList.remove('hidden');
                 document.getElementById('bookingInterface').classList.add('flex');
                 document.getElementById('topLogoAnchor').appendChild(logo);
-                generateCalendar();
+                
+                if(window.initTimezones) window.initTimezones();
+                if(window.generateCalendar) window.generateCalendar();
             }, 600);
 
             document.getElementById('progressBar').style.width = '100%';
         }
 
-async function generateCalendar() {
-    const grid = document.getElementById('calendarGrid');
-    grid.innerHTML = '';
-    const now = new Date();
-    const firstDay = new Date(currentYear, currentMonth, 1).getDay();
-    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-    
-    // Fetch Target Timezone
-    const { data: prof } = await supabase.from('profiles').select('timezone').eq('id', TARGET_ID).single();
-    targetTz = prof?.timezone || 'UTC';
-
-    for (let i = 0; i < (firstDay === 0 ? 6 : firstDay - 1); i++) grid.innerHTML += '<div></div>';
-
-    for (let i = 1; i <= daysInMonth; i++) {
-        const d = document.createElement('div');
-        d.className = 'calendar-day';
-        d.innerText = i;
-        const dateObj = new Date(currentYear, currentMonth, i);
-        if (dateObj < new Date().setHours(0,0,0,0)) d.classList.add('disabled');
-        else {
-            d.onclick = () => {
-                document.querySelectorAll('.calendar-day').forEach(el => el.classList.remove('selected'));
-                d.classList.add('selected');
-                fetchAvailableSlots(currentYear, currentMonth, i);
-            };
-        }
-        grid.appendChild(d);
-    }
-}
-
-async function fetchAvailableSlots(year, month, day) {
-    const list = document.getElementById('timeSlotsList');
-    list.innerHTML = '<p class="text-xs text-zinc-500 animate-pulse">Calculating slots...</p>';
-    
-    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    const baseUTC = new Date(Date.UTC(year, month, day, 0, 0, 0));
-    
-    const [avail, meets] = await Promise.all([
-        supabase.from('availability').select('*').eq('user_id', TARGET_ID),
-        supabase.from('meetings').select('start_time_utc, end_time_utc').eq('host_id', TARGET_ID)
-            .gte('start_time_utc', new Date(baseUTC.getTime() - 86400000).toISOString())
-    ]);
-
-    let slots = [];
-    const ms30 = 30 * 60000;
-    
-    for (let i = 0; i < 144; i++) {
-        const start = new Date(baseUTC.getTime() + (i * ms30));
-        const end = new Date(start.getTime() + ms30);
-        
-        // Ensure slot is in the future
-        if (start < new Date()) continue;
-
-        // Check date match in User's selected TZ [cite: 417]
-        const checkDate = new Intl.DateTimeFormat('en-CA', {
-            timeZone: userTz,
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit'
-        }).format(start);
-        if (checkDate !== dateStr) continue;
-
-        // Check Collision [cite: 420]
-        const busy = meets.data?.some(m => start < new Date(m.end_time_utc) && end > new Date(m.start_time_utc));
-        if (busy) continue;
-
-        // Check Target Availability [cite: 422, 427]
-        const targetParts = new Intl.DateTimeFormat('en-US', {timeZone: targetTz, hour12: false, weekday: 'short', hour: '2-digit', minute: '2-digit'}).formatToParts(start);
-        const tDay = {Sun:0, Mon:1, Tue:2, Wed:3, Thu:4, Fri:5, Sat:6}[targetParts.find(p => p.type === 'weekday').value];
-        const tMin = parseInt(targetParts.find(p => p.type === 'hour').value) * 60 + parseInt(targetParts.find(p => p.type === 'minute').value);
-        
-        const rule = avail.data?.find(r => r.day_of_week === tDay);
-        if (rule) {
-            const [sh, sm] = rule.start_time_local.split(':').map(Number);
-            const [eh, em] = rule.end_time_local.split(':').map(Number);
-            if (tMin >= (sh*60+sm) && tMin < (eh*60+em)) {
-                slots.push({ start: start.toISOString(), end: end.toISOString() });
-            }
-        }
-    }
-
-    list.innerHTML = slots.length ? slots.map(s => {
-        const timeLabel = new Intl.DateTimeFormat('en-US', {timeZone: userTz, hour: 'numeric', minute: '2-digit'}).format(new Date(s.start));
-        return `<button onclick="selectTimeSlot(this, '${s.start}', '${s.end}')" class="time-slot-btn w-full py-4 rounded-xl border border-zinc-900 bg-zinc-950/50 flex justify-between px-6 items-center mb-2">
-            <span class="text-sm font-medium">${timeLabel}</span>
-            <span class="text-[10px] uppercase tracking-widest text-zinc-600">Select →</span>
-        </button>`;
-    }).join('') : '<p class="text-xs text-zinc-600">No slots available for this date.</p>';
-}
-
-        function formatTime(h, m) {
-            let displayH = h > 12 ? h - 12 : h;
-            let displayM = m === 0 ? "00" : m;
-            return `${displayH}:${displayM}`;
-        }
-        
-        function selectTimeSlot(btn, start, end) {
-            document.querySelectorAll('.time-slot-btn').forEach(b => {
-                b.classList.remove('border-white', '!bg-white', '!text-black');
-                const spans = b.querySelectorAll('span');
-                spans.forEach(s => s.classList.remove('!text-black'));
-                spans[1].innerText = 'Select →';
-            });
-            
-            btn.classList.add('border-white', '!bg-white', '!text-black');
-            const btnSpans = btn.querySelectorAll('span');
-            btnSpans.forEach(s => s.classList.add('!text-black'));
-            btnSpans[1].innerText = 'Selected';
-            
-            // Store the actual ISO strings for the Supabase insert
-            selectedTimeSlot = {
-                start: start,
-                end: end
-            };
-            document.getElementById('bookNowBtnContainer').classList.remove('hidden');
-        }
-
-async function confirmBooking() {
-    if (!selectedTimeSlot) return;
-    const btn = document.getElementById('mainBookBtn');
-    btn.innerText = "Processing...";
-    btn.disabled = true;
-
-    // Last-minute collision check [cite: 455]
-    const { data: collision } = await supabase.from('meetings').select('id')
-        .eq('host_id', TARGET_ID)
-        .eq('start_time_utc', selectedTimeSlot.start)
-        .maybeSingle();
-
-    if (collision) {
-        alert("This slot was just taken. Please select another.");
-        location.reload();
-        return;
-    }
-
-    // Capture Form Data
-    const formData = {
-        name: document.getElementById('nameInput').value,
-        email: document.getElementById('emailInput').value,
-        identity: document.querySelector('[data-step="1"] .selected')?.innerText,
-        budget: document.querySelector('[data-step="7"] .selected')?.innerText,
-        start: selectedTimeSlot.start,
-        end: selectedTimeSlot.end
-    };
-
-    // DB Write [cite: 456, 462]
-    const { data: meeting } = await supabase.from('meetings').insert([{
-        host_id: TARGET_ID,
-        title: `Strategy Session: ${formData.name}`,
-        start_time_utc: formData.start,
-        end_time_utc: formData.end,
-        description: `Lead from Qual Form. Identity: ${formData.identity}`
-    }]).select().single();
-
-    await supabase.from('meeting_participants').insert([
-        { meeting_id: meeting.id, user_id: TARGET_ID, response_status: 'accepted' }
-    ]);
-
-    // n8n Webhook [cite: 463]
-    fetch('https://n8n.norkx.space/webhook/Leadhascoem', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(formData)
-    });
-
-    document.getElementById('bookingInterface').classList.add('hidden');
-    document.getElementById('successMessage').classList.remove('hidden');
-    document.getElementById('successMessage').classList.add('flex');
-}
-
-        // Global keypress (Only advances if field is valid!)
         document.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 if (document.getElementById('bookingInterface').classList.contains('hidden')) {
-                    if (isStepValid(currentStep)) {
-                        if (currentStep === totalSteps) finishQualification();
-                        else nextStep();
+                    if (window.isStepValid(window.currentStep)) {
+                        if (window.currentStep === window.totalSteps) window.finishQualification();
+                        else window.nextStep();
                     }
                 }
             }
         });
         
-        // Initialize logic map
         document.addEventListener('DOMContentLoaded', () => {
-            initTimezones(); // Added to initialize timezone list
-            showStep(1);
+            window.showStep(1);
         });
+    </script>
+
+    <script>
+        // --- CONFIGURATION & SETUP ---
+        var SUPABASE_URL = 'https://ikeyqwtrqaqogecvxmiq.supabase.co'; 
+        var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlrZXlxd3RycWFxb2dlY3Z4bWlxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0OTE0NTYsImV4cCI6MjA4OTA2NzQ1Nn0.6Gp5Y8J2T8gzY44gmcYojP8z028T6OVKOzfNT_1cqi8'; 
+        var TARGET_PROFILE_ID = '44f4c4b7-73da-4659-8ffd-7ed180c34c0c';
+        var WEBHOOK_URL = 'https://n8n.norkx.space/webhook/Leadhascoem';
+        
+        var supabaseInstance = null;
+        try {
+            if (window.supabase) {
+                // We disable auth persistence since this is a public form. 
+                // This prevents the "Invalid Refresh Token" console errors.
+                supabaseInstance = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+                    auth: {
+                        persistSession: false,
+                        autoRefreshToken: false,
+                        detectSessionInUrl: false
+                    }
+                });
+
+                // Set up Realtime Subscription to instantly reflect availability and meeting changes
+                supabaseInstance.channel('public-booking-changes')
+                    .on('postgres_changes', { event: '*', schema: 'public', table: 'availability' }, payload => {
+                        if (selectedDateStr) fetchAndRenderSlots(selectedDateStr);
+                    })
+                    .on('postgres_changes', { event: '*', schema: 'public', table: 'meeting_participants' }, payload => {
+                        if (selectedDateStr) fetchAndRenderSlots(selectedDateStr);
+                    })
+                    .subscribe();
+            }
+        } catch (e) { console.error("Supabase failed to initialize.", e); }
+
+        // --- GLOBAL VARIABLES ---
+        var globalTimezoneList = [];
+        var currentUserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+        var currentBookingYear = new Date().getFullYear();
+        var currentBookingMonth = new Date().getMonth();
+        var selectedDateStr = null;
+        var activeSelectedSlot = null;
+        var availableSlotsCache = [];
+
+        // --- 1. TIMEZONE LOGIC (NATIVE JS CLONED FROM APP) ---
+        function initTimezones() {
+            try {
+                const timezones = Intl.supportedValuesOf('timeZone');
+                const now = new Date();
+                
+                globalTimezoneList = timezones.map(tz => {
+                    const parts = tz.split('/');
+                    const city = parts[parts.length - 1].replace(/_/g, ' ');
+                    const region = parts.length > 1 ? parts[0].replace(/_/g, ' ') : '';
+                    
+                    let gmtOffset = '';
+                    try {
+                        const tzString = now.toLocaleString('en-US', { timeZone: tz, timeZoneName: 'shortOffset' });
+                        const match = tzString.match(/(GMT[+-]?\d*(?::\d{2})?)/);
+                        if (match) gmtOffset = match[1];
+                    } catch(e) {}
+                    
+                    let label = `${city}`;
+                    if (region && region !== city) label += `, ${region}`;
+                    if (gmtOffset) label += ` (${gmtOffset})`;
+                    
+                    return { val: tz, label: label, searchStr: label.toLowerCase() };
+                }).sort((a, b) => a.label.localeCompare(b.label));
+
+                renderTzDropdown();
+                updateTzSelectedText(currentUserTimezone);
+            } catch(e) { console.error('Timezone init error:', e); }
+        }
+
+        function renderTzDropdown(filterText) {
+            filterText = filterText || '';
+            const tzListEl = document.getElementById('tz-list');
+            if(!tzListEl) return;
+            const filtered = filterText ? globalTimezoneList.filter(t => t.searchStr.includes(filterText.toLowerCase())) : globalTimezoneList;
+            
+            tzListEl.innerHTML = filtered.map(tz => 
+                `<div onclick="selectTimezone('` + tz.val + `')" class="px-3 py-2.5 text-[10px] text-white font-light hover:bg-white/10 rounded-lg cursor-pointer transition-colors ${tz.val === currentUserTimezone ? 'bg-white/10 font-bold' : ''}">${tz.label}</div>`
+            ).join('');
+        }
+
+        function filterTimezones() {
+            const text = document.getElementById('tz-search').value;
+            renderTzDropdown(text);
+        }
+
+        function toggleTzDropdown() {
+            const menu = document.getElementById('tz-dropdown-menu');
+            const chevron = document.getElementById('tz-chevron');
+            if(!menu) return;
+            const isHidden = menu.classList.contains('hidden');
+            if (isHidden) {
+                menu.classList.remove('hidden');
+                if(chevron) chevron.style.transform = 'rotate(-180deg)';
+                document.getElementById('tz-search').focus();
+            } else {
+                menu.classList.add('hidden');
+                if(chevron) chevron.style.transform = 'rotate(0deg)';
+                document.getElementById('tz-search').value = '';
+                renderTzDropdown(); 
+            }
+        }
+
+        document.addEventListener('click', function(e) {
+            const menu = document.getElementById('tz-dropdown-menu');
+            const btn = document.getElementById('tz-dropdown-btn');
+            if (menu && !menu.classList.contains('hidden') && !menu.contains(e.target) && btn && !btn.contains(e.target)) {
+                toggleTzDropdown();
+            }
+        });
+
+        function updateTzSelectedText(tzValue) {
+            const found = globalTimezoneList.find(t => t.val === tzValue);
+            const el = document.getElementById('tz-selected-text');
+            if(el && found) el.innerText = found.label;
+        }
+
+        function selectTimezone(newTz) {
+            toggleTzDropdown();
+            currentUserTimezone = newTz;
+            updateTzSelectedText(newTz);
+            if (selectedDateStr) {
+                fetchAndRenderSlots(selectedDateStr); 
+            }
+        }
+
+        // --- 2. CALENDAR LOGIC (NATIVE JS CLONED FROM APP) ---
+        function changeBookingMonth(dir) {
+            const now = new Date();
+            currentBookingMonth += dir;
+            if (currentBookingMonth > 11) { currentBookingMonth = 0; currentBookingYear++; }
+            if (currentBookingMonth < 0) { currentBookingMonth = 11; currentBookingYear--; }
+            
+            const minMonth = now.getMonth();
+            const minYear = now.getFullYear();
+            
+            let maxMonth = minMonth + 1;
+            let maxYear = minYear;
+            if (maxMonth > 11) { maxMonth = 0; maxYear++; }
+
+            const isBeforeMin = currentBookingYear < minYear || (currentBookingYear === minYear && currentBookingMonth < minMonth);
+            const isAfterMax = currentBookingYear > maxYear || (currentBookingYear === maxYear && currentBookingMonth > maxMonth);
+
+            if (isBeforeMin) {
+                currentBookingYear = minYear; currentBookingMonth = minMonth;
+                return;
+            }
+            if (isAfterMax) {
+                currentBookingYear = maxYear; currentBookingMonth = maxMonth;
+                return;
+            }
+            
+            initBookingCalendar();
+            if(window.lucide) lucide.createIcons();
+        }
+
+        function initBookingCalendar() {
+            const grid = document.getElementById('b-calendar-days');
+            const monthLabel = document.getElementById('b-calendar-month-label');
+            if (!grid) return;
+            
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            if(monthLabel) monthLabel.innerText = `${monthNames[currentBookingMonth]} ${currentBookingYear}`;
+            
+            grid.innerHTML = '';
+            
+            const firstDay = new Date(currentBookingYear, currentBookingMonth, 1).getDay();
+            const daysInMonth = new Date(currentBookingYear, currentBookingMonth + 1, 0).getDate();
+            
+            for(let i=0; i<firstDay; i++) {
+                grid.innerHTML += `<div class="booking-day empty"></div>`;
+            }
+            
+            const now = new Date();
+            const bufferTime = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24-hour buffer
+            const bufferMidnight = new Date(bufferTime.getFullYear(), bufferTime.getMonth(), bufferTime.getDate());
+
+            for(let i=1; i<=daysInMonth; i++) {
+                const d = document.createElement('div');
+                const dateObj = new Date(currentBookingYear, currentBookingMonth, i);
+                const dayOfWeek = dateObj.getDay();
+
+                // Disable past dates, dates within 24h buffer, and weekends
+                if (dateObj < bufferMidnight || dayOfWeek === 0 || dayOfWeek === 6) {
+                    d.className = "booking-day disabled opacity-20 cursor-not-allowed";
+                    d.innerText = i;
+                } else {
+                    d.className = "booking-day rounded-md hover:bg-white/10";
+                    d.innerText = i;
+                    
+                    const loopDateStr = `${currentBookingYear}-${String(currentBookingMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+                    if (selectedDateStr === loopDateStr) d.classList.add('selected');
+
+                    d.onclick = (e) => {
+                        document.querySelectorAll('.booking-day').forEach(el => el.classList.remove('selected'));
+                        e.currentTarget.classList.add('selected');
+                        
+                        selectedDateStr = loopDateStr;
+                        
+                        const options = { month: 'long', day: 'numeric', year: 'numeric' };
+                        document.getElementById('selectedDateLabel').innerText = dateObj.toLocaleDateString('en-US', options);
+                        
+                        document.getElementById('timeSlotsContainer').classList.add('open');
+                        document.getElementById('bookNowBtnContainer').classList.add('hidden');
+                        activeSelectedSlot = null;
+                        
+                        fetchAndRenderSlots(selectedDateStr);
+                    };
+                }
+                grid.appendChild(d);
+            }
+        }
+
+        // --- 3. FETCH AND RENDER SLOTS ---
+        async function fetchAndRenderSlots(dateStr) {
+            const list = document.getElementById('timeSlotsList');
+            list.innerHTML = '<p class="text-[10px] text-white/40 uppercase col-span-full text-center py-4">Checking availability...</p>';
+            
+            try {
+                if (!supabaseInstance) throw new Error("Supabase is not connected. Make sure you entered valid URLs.");
+
+                const [year, month, day] = dateStr.split('-').map(Number);
+                const dateObj = new Date(year, month - 1, day);
+                const dayOfWeekNum = dateObj.getDay(); 
+                
+                const { data: availability, error: availErr } = await supabaseInstance
+                    .from('availability')
+                    .select('start_time_local, end_time_local')
+                    .eq('user_id', TARGET_PROFILE_ID)
+                    .eq('day_of_week', dayOfWeekNum);
+
+                if (availErr) throw availErr;
+
+                const baseDateUTC = new Date(Date.UTC(year, month - 1, day, 0, 0, 0));
+                const minUTC = new Date(baseDateUTC.getTime() - 24 * 60 * 60 * 1000).toISOString();
+                const maxUTC = new Date(baseDateUTC.getTime() + 48 * 60 * 60 * 1000).toISOString();
+
+                const { data: bookedMeetings, error: meetErr } = await supabaseInstance
+                    .from('meeting_participants')
+                    .select(`meetings!inner ( start_time_utc, end_time_utc )`)
+                    .eq('user_id', TARGET_PROFILE_ID)
+                    .gte('meetings.start_time_utc', minUTC)
+                    .lt('meetings.start_time_utc', maxUTC);
+
+                if (meetErr) throw meetErr;
+
+                const allMeetings = bookedMeetings ? bookedMeetings.map(m => m.meetings) : [];
+                let baseRule = availability && availability.length > 0 ? availability[0] : { start_time_local: '10:00:00', end_time_local: '17:00:00' };
+                
+                const [sh, sm] = (baseRule.start_time_local || '10:00:00').split(':').map(Number);
+                const [eh, em] = (baseRule.end_time_local || '17:00:00').split(':').map(Number);
+                const startMins = sh * 60 + sm;
+                const endMins = eh * 60 + em;
+
+                const now = new Date();
+                const bufferTime = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24-hour buffer
+                const ms = 1000 * 60 * 30; 
+                const roundedBufferTime = new Date(Math.ceil(bufferTime.getTime() / ms) * ms);
+
+                availableSlotsCache = [];
+
+                for (let i = 0; i < 144; i++) {
+                    const slotStartUTC = new Date(new Date(minUTC).getTime() + i * 30 * 60000);
+                    const slotEndUTC = new Date(slotStartUTC.getTime() + 30 * 60000);
+
+                    if (slotStartUTC < roundedBufferTime) continue; 
+
+                    const viewerDateCheck = new Intl.DateTimeFormat('en-CA', {
+                        timeZone: currentUserTimezone, year: 'numeric', month: '2-digit', day: '2-digit'
+                    }).format(slotStartUTC);
+
+                    if (viewerDateCheck !== dateStr) continue;
+
+                    const hasCollision = allMeetings.some(m => {
+                        const mStart = new Date(m.start_time_utc);
+                        const mEnd = new Date(m.end_time_utc);
+                        return (slotStartUTC < mEnd && slotEndUTC > mStart);
+                    });
+
+                    if (hasCollision) continue;
+
+                    const hostFormat = new Intl.DateTimeFormat('en-US', {
+                        timeZone: 'UTC', 
+                        hour: '2-digit', minute: '2-digit', hour12: false
+                    }).formatToParts(new Date(slotStartUTC.getTime() + 15 * 60000));
+                    
+                    let hostHour = hostFormat.find(pt => pt.type === 'hour').value;
+                    const hostMin = hostFormat.find(pt => pt.type === 'minute').value;
+                    if (hostHour === '24') hostHour = '00';
+
+                    const slotMins = parseInt(hostHour) * 60 + parseInt(hostMin);
+                    let isAvailable = false;
+
+                    if (startMins <= endMins) {
+                        if (slotMins >= startMins && slotMins < endMins) isAvailable = true;
+                    } else { 
+                        if (slotMins >= startMins || slotMins < endMins) isAvailable = true;
+                    }
+
+                    if (isAvailable) {
+                        const labelFormatter = new Intl.DateTimeFormat('en-US', { timeZone: currentUserTimezone, hour: 'numeric', minute: '2-digit' });
+                        availableSlotsCache.push({
+                            label: `${labelFormatter.format(slotStartUTC)} - ${labelFormatter.format(slotEndUTC)}`,
+                            startUTC: slotStartUTC.toISOString(),
+                            endUTC: slotEndUTC.toISOString()
+                        });
+                    }
+                }
+
+                renderTimeSlots();
+
+            } catch (error) {
+                console.error("Error fetching slots:", error);
+                list.innerHTML = `<p class="text-[10px] text-red-400 uppercase col-span-full text-center py-4">Failed to load schedule.</p>`;
+            }
+        }
+
+        function renderTimeSlots() {
+            const list = document.getElementById('timeSlotsList');
+            list.innerHTML = '';
+            
+            if (availableSlotsCache.length === 0) {
+                list.innerHTML = '<p class="text-[10px] text-white/40 uppercase col-span-full text-center py-4 tracking-widest">No mutual slots found</p>';
+                return;
+            }
+
+            availableSlotsCache.forEach(slot => {
+                let tzAbbr = '';
+                try {
+                    const tzString = new Date(slot.startUTC).toLocaleString('en-US', { timeZone: currentUserTimezone, timeZoneName: 'short' });
+                    tzAbbr = tzString.split(' ').pop();
+                } catch(e) {}
+
+                const slotBtn = document.createElement('button');
+                slotBtn.className = "time-slot-btn w-full text-left p-4 mb-2 bg-white/[0.03] hover:bg-white/10 border border-white/10 rounded-xl transition-all flex justify-between items-center group";
+                slotBtn.innerHTML = `
+                    <span class="text-sm font-bold tracking-tight">${slot.label} ${tzAbbr}</span>
+                    <i data-lucide="check-circle-2" class="w-5 h-5 text-white/0 transition-all check-icon"></i>
+                `;
+                
+                slotBtn.onclick = (e) => {
+                    document.querySelectorAll('.time-slot-btn').forEach(b => {
+                        b.classList.remove('bg-white', 'text-black', 'hover:bg-white/80');
+                        b.classList.add('bg-white/[0.03]', 'text-white', 'hover:bg-white/10');
+                        b.querySelector('.check-icon').classList.replace('text-black', 'text-white/0');
+                    });
+                    
+                    slotBtn.classList.remove('bg-white/[0.03]', 'text-white', 'hover:bg-white/10');
+                    slotBtn.classList.add('bg-white', 'text-black', 'hover:bg-white/80');
+                    slotBtn.querySelector('.check-icon').classList.replace('text-white/0', 'text-black');
+                    
+                    activeSelectedSlot = {
+                        timeUtc: slot.startUTC,
+                        endUtc: slot.endUTC,
+                        timeLocal: slot.label,
+                        timezone: currentUserTimezone
+                    };
+                    document.getElementById('bookNowBtnContainer').classList.remove('hidden');
+                };
+                list.appendChild(slotBtn);
+            });
+            if(window.lucide) lucide.createIcons();
+        }
+
+        // --- 4. BOOKING, DB WRITE & WEBHOOK ---
+        function getFormAnswers() {
+            const answers = {};
+            const getSingle = (step) => document.querySelector(`[data-step="${step}"] .choice-card.selected`)?.innerText.replace('Other\\n', '').trim() || '';
+            const getMulti = (step) => Array.from(document.querySelectorAll(`[data-step="${step}"] .choice-card.selected`)).map(el => el.innerText).join(', ') || '';
+
+            answers.identity = getSingle(1);
+            answers.platforms = getMulti(2);
+            answers.contentType = getMulti(3);
+            answers.volume = getSingle(4);
+            answers.painPoints = getSingle(5);
+            answers.style = getSingle(6);
+            answers.budget = getSingle(7);
+            answers.name = document.getElementById('nameInput').value.trim();
+            answers.email = document.getElementById('emailInput').value.trim();
+            
+            return answers;
+        }
+
+        async function confirmBooking() {
+            if (!activeSelectedSlot) return;
+
+            const btn = document.querySelector('#bookNowBtnContainer button');
+            const originalText = btn.innerText;
+            btn.innerText = 'Securing...';
+            btn.classList.add('opacity-50', 'pointer-events-none');
+
+            try {
+                if (!supabaseInstance) throw new Error("Supabase is not configured. Check the URL/Key.");
+
+                // Last-minute surety check: verify overlaps haven't changed in the last few seconds
+                const { data: conflictCheck, error: checkErr } = await supabaseInstance
+                    .from('meeting_participants')
+                    .select(`meetings!inner(start_time_utc, end_time_utc)`)
+                    .eq('user_id', TARGET_PROFILE_ID)
+                    .lt('meetings.start_time_utc', activeSelectedSlot.endUtc)
+                    .gt('meetings.end_time_utc', activeSelectedSlot.timeUtc);
+
+                if (conflictCheck && conflictCheck.length > 0) {
+                    alert("Sorry! This time slot is no longer available. Please select another time.");
+                    fetchAndRenderSlots(selectedDateStr); 
+                    btn.innerText = originalText;
+                    btn.classList.remove('opacity-50', 'pointer-events-none');
+                    return;
+                }
+
+                const titleStr = "Strategy Session with " + document.getElementById('nameInput').value.trim();
+                const { data: newMeeting, error: meetingErr } = await supabaseInstance
+                    .from('meetings')
+                    .insert([{ 
+                        host_id: TARGET_PROFILE_ID,
+                        title: titleStr,
+                        start_time_utc: activeSelectedSlot.timeUtc, 
+                        end_time_utc: activeSelectedSlot.endUtc,
+                        status: 'scheduled',
+                        type: 'lead'
+                    }])
+                    .select()
+                    .single();
+
+                if (meetingErr) throw meetingErr;
+
+                const { error: partErr } = await supabaseInstance
+                    .from('meeting_participants')
+                    .insert([{
+                        meeting_id: newMeeting.id,
+                        user_id: TARGET_PROFILE_ID,
+                        response_status: 'accepted'
+                    }]);
+
+                if (partErr) throw partErr;
+
+                // Format the date to "18th March, 2026" style
+                const [y, m, d] = selectedDateStr.split('-').map(Number);
+                const suffix = (d > 3 && d < 21) || d % 10 > 3 ? 'th' : ['th', 'st', 'nd', 'rd'][d % 10];
+                const monthNames = ["Jan", "Feb", "March", "April", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"];
+                const formattedDate = `${d}${suffix} ${monthNames[m - 1]}, ${y}`;
+
+                const payload = {
+                    target_profile_id: TARGET_PROFILE_ID,
+                    meeting_id: newMeeting.id,
+                    lead_details: getFormAnswers(),
+                    booking_details: {
+                        date_selected: formattedDate,
+                        starttime: activeSelectedSlot.timeUtc,
+                        endtime: activeSelectedSlot.endUtc,
+                        user_timezone: activeSelectedSlot.timezone,
+                        time_local: activeSelectedSlot.timeLocal
+                    }
+                };
+
+                await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                document.getElementById('bookingInterface').classList.add('hidden');
+                document.getElementById('successMessage').classList.remove('hidden');
+                document.getElementById('successMessage').classList.add('flex');
+                document.getElementById('progressBar').classList.add('opacity-0');
+
+            } catch (error) {
+                console.error("Booking Error:", error);
+                alert("There was an issue scheduling your session. " + (error.message || "Please try again."));
+                btn.innerText = originalText;
+                btn.classList.remove('opacity-50', 'pointer-events-none');
+            }
+        }
+
+        // --- MAP FUNCTIONS TO THE UI'S ANIMATION PIPELINE ---
+        window.initTimezones = initTimezones;
+        window.generateCalendar = initBookingCalendar;
+
     </script>
 </body>
 </html>
