@@ -510,7 +510,7 @@
         // --- CONFIGURATION & SETUP ---
         var SUPABASE_URL = 'https://ikeyqwtrqaqogecvxmiq.supabase.co'; 
         var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlrZXlxd3RycWFxb2dlY3Z4bWlxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0OTE0NTYsImV4cCI6MjA4OTA2NzQ1Nn0.6Gp5Y8J2T8gzY44gmcYojP8z028T6OVKOzfNT_1cqi8'; 
-        var TARGET_PROFILE_ID = '44f4c4b7-73da-4659-8ffd-7ed180c34c0c';
+        var TARGET_PROFILE_ID = '45ffdb80-c36d-43ac-bd95-5e84a46b085d';
         var WEBHOOK_URL = 'https://n8n.norkx.space/webhook/Leadhascoem';
         
         var supabaseInstance = null;
@@ -754,10 +754,17 @@
                 if (meetErr) throw meetErr;
 
                 const allMeetings = bookedMeetings ? bookedMeetings.map(m => m.meetings) : [];
-                let baseRule = availability && availability.length > 0 ? availability[0] : { start_time_local: '10:00:00', end_time_local: '17:00:00' };
                 
-                const [sh, sm] = (baseRule.start_time_local || '10:00:00').split(':').map(Number);
-                const [eh, em] = (baseRule.end_time_local || '17:00:00').split(':').map(Number);
+                // STRICT RULE: If the DB returns no availability for this day, do not use static fallbacks.
+                if (!availability || availability.length === 0) {
+                    availableSlotsCache = [];
+                    renderTimeSlots();
+                    return;
+                }
+                
+                let baseRule = availability[0];
+                const [sh, sm] = baseRule.start_time_local.split(':').map(Number);
+                const [eh, em] = baseRule.end_time_local.split(':').map(Number);
                 const startMins = sh * 60 + sm;
                 const endMins = eh * 60 + em;
 
