@@ -39,6 +39,28 @@
       height: 100dvh !important; 
   }
 
+  /* 4. If we detect SAMSUNG INTERNET specifically */
+  body.is-samsung-browser {
+      /* Samsung Internet handles body fixed positioning weirdly. */
+      /* We release the fixed lock on body to let Samsung's native UI flex naturally. */
+      position: relative !important;
+      height: 100dvh !important;
+  }
+  
+  body.is-samsung-browser .step {
+      /* Anchor steps to dynamic viewport height rather than absolute stretching */
+      position: absolute;
+      height: 100dvh !important;
+      top: 0;
+      bottom: auto;
+      padding-bottom: 140px !important; /* Extra padding to clear Samsung's bottom action bar */
+  }
+
+  body.is-samsung-browser .nav-pill {
+      /* Push the nav pill higher to avoid Samsung's bottom toolbar */
+      bottom: 80px !important; 
+  }
+  
   :root {
     --bg-color: #ffffff;
     --text-color: #000000;
@@ -1099,11 +1121,17 @@
       ];
       
       const isInApp = rules.some(rule => ua.indexOf(rule) > -1);
+      const isSamsung = /SamsungBrowser/i.test(ua);
       
       if (isInApp) {
           body.classList.add('is-in-app-browser');
           // Optional: You can even detect which specific one if needed
           if (ua.indexOf('LinkedInApp') > -1) body.classList.add('is-linkedin');
+      }
+
+      // 3. Detect Samsung Internet specifically
+      if (isSamsung) {
+          body.classList.add('is-samsung-browser');
       }
   }
 
