@@ -1,998 +1,1626 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book Your Call Now!</title>
-    <link rel="icon" type="image/png" href="https://res.cloudinary.com/dobnqmfsg/image/upload/v1771827572/Untitled_design-removebg-preview_bj0uah.png">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #000; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
-        
-        /* Exact Calendar CSS from callbookn8n */
-        .booking-calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
-        .booking-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; cursor: pointer; border: 1px solid transparent; transition: all 0.2s; border-radius: 6px; }
-        .booking-day:hover:not(.empty) { background: rgba(255,255,255,0.1); }
-        .booking-day.selected { background: white; color: black; font-weight: bold; }
-        .booking-day.empty { pointer-events: none; }
-        .booking-day.disabled { opacity: 0.2; cursor: not-allowed; pointer-events: none; }
-    </style>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #000;
-            color: #fff;
-            margin: 0;
-            overflow-x: hidden;
-        }
+<title>Shortscut Inc Form Clone</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root {
+    --bg-color: #ffffff;
+    --text-color: #000000;
+    --accent-color: #032330;
+    --input-border: rgba(0, 0, 0, 0.3);
+    --font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  }
 
-        .step-content {
-            display: none;
-            animation: fadeIn 0.6s ease-out forwards;
-        }
+  body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: var(--font-family);
+    overflow: hidden; /* Hide scrollbars for the full-screen effect */
+  }
 
-        .step-content.active {
-            display: flex;
-        }
+  /* The main container */
+  #form-container {
+    height: 100vh;
+    width: 100%;
+    position: relative;
+  }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+  /* Each question takes up exactly one full screen (100vh) */
+  .step {
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    visibility: hidden;
+    /* Transition removed to prevent snapping; animations handle movement strictly */
+  }
 
-        .input-underline {
-            background: transparent;
-            border: none;
-            border-bottom: 2px solid #333;
-            outline: none;
-            transition: border-color 0.3s;
-            width: 100%;
-            padding: 10px 0;
-            font-size: 1.5rem;
-            color: #fff;
-        }
+  /* Class to slide the old question up and out */
+  .step.exit-up {
+    animation: slideOutUp 0.5s cubic-bezier(0.5, 0, 0.8, 0.2) forwards; /* Smoother, less exponential acceleration */
+    z-index: 5;
+  }
 
-        .input-underline:focus {
-            border-color: #fff;
-        }
+  /* Class to slide the old question down and out */
+  .step.exit-down {
+    animation: slideOutDown 0.5s cubic-bezier(0.5, 0, 0.8, 0.2) forwards; /* Smoother, less exponential acceleration */
+    z-index: 5;
+  }
 
-        .choice-card {
-            border: 1px solid #222;
-            transition: all 0.2s ease;
-            cursor: pointer;
-            background-color: #000;
-        }
+  @keyframes slideOutUp {
+    0% {
+      opacity: 1;
+      transform: translateY(0);
+      visibility: visible;
+    }
+    70% {
+      opacity: 0.3; /* Fades to zero non-linearly right as it reaches the screen border */
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-100vh); /* crosses the top border completely */
+      visibility: hidden;
+    }
+  }
 
-        .choice-card:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.4);
-            color: #fff;
-        }
+  @keyframes slideOutDown {
+    0% {
+      opacity: 1;
+      transform: translateY(0);
+      visibility: visible;
+    }
+    70% {
+      opacity: 0.3; /* Fades to zero non-linearly right as it reaches the screen border */
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(100vh); /* crosses the bottom border completely */
+      visibility: hidden;
+    }
+  }
 
-        .choice-card.selected {
-            background: #fff;
-            color: #000;
-            border-color: #fff;
-        }
+  .step.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    z-index: 10;
+    animation: blurFadeOut 0.8s ease forwards;
+  }
 
-        .calendar-day {
-            aspect-ratio: 1/1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            border-radius: 99px;
-            transition: 0.2s;
-            font-size: 0.875rem;
-        }
+  @keyframes blurFadeOut {
+    0% {
+      filter: blur(4px); /* Slightly reduced blur */
+    }
+    100% {
+      filter: blur(0px);
+    }
+  }
 
-        .calendar-day:hover:not(.disabled) {
-            background: #222;
-            color: #fff;
-        }
+  
+  /* Set initial state for the line-by-line elements */
+  .step .step-content > * {
+    opacity: 0;
+    transform: translateY(20px);
+  }
 
-        .calendar-day.selected {
-            background: #fff !important;
-            color: #000 !important;
-            font-weight: 600;
-        }
+  /* Keep children fully visible while the parent container fades and slides out */
+  .step.exit-up .step-content > *,
+  .step.exit-down .step-content > * {
+    opacity: 1;
+    transform: translateY(0);
+  }
 
-        .calendar-day.disabled {
-            opacity: 0.15;
-            cursor: not-allowed;
-        }
+  /* Trigger the drift-up animation when the step becomes active (forward) */
+  .step.active:not(.reverse) .step-content > * {
+    animation: fadeUp 0.6s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+  }
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: #000; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
-        
-        /* Hide Scrollbar for Left Panel (Middle of screen) */
-        #leftPanel::-webkit-scrollbar { display: none; }
-        #leftPanel { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        #timeSlotsContainer {
-            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-            max-width: 0;
-            opacity: 0;
-            overflow: hidden;
-        }
+  /* Trigger the drift-down animation when the step becomes active (backward) */
+  .step.active.reverse .step-content > * {
+    animation: fadeDown 0.6s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+  }
 
-        #timeSlotsContainer.open {
-            max-width: 400px;
-            opacity: 1;
-            margin-left: 2rem;
-        }
+  /* Stagger the delays so they appear line-by-line quickly */
+  .step.active .step-content > *:nth-child(1) { animation-delay: 0.1s; }
+  .step.active .step-content > *:nth-child(2) { animation-delay: 0.2s; }
+  .step.active .step-content > *:nth-child(3) { animation-delay: 0.3s; }
+  .step.active .step-content > *:nth-child(4) { animation-delay: 0.4s; }
+  .step.active .step-content > *:nth-child(5) { animation-delay: 0.5s; }
+  .step.active .step-content > *:nth-child(6) { animation-delay: 0.6s; }
 
-        @media (max-width: 768px) {
-            #timeSlotsContainer.open {
-                max-width: 100%;
-                margin-left: 0;
-                margin-top: 2rem;
-            }
-        }
-    </style>
+  @keyframes fadeUp {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeDown {
+    0% {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .step-content {
+    width: 100%;
+    max-width: 900px;
+    padding: 40px;
+    box-sizing: border-box;
+  }
+
+  .question-header {
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 1.4;
+    margin-bottom: 10px;
+    display: flex;
+  }
+
+  
+  .question-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--accent-color);
+    color: var(--bg-color);
+    min-width: 18px;
+    height: 20px;
+    border-radius: 7px 4px 7px 4px;
+    margin-right: 12px;
+    font-size: 11px;
+    font-weight: bold;
+    flex-shrink: 0;
+    margin-top: 4px;
+    margin-bottom: 6px;
+    padding: 0 2px;
+  }
+
+  /* Fix for Browser Autofill blue background issue */
+  .tf-input:-webkit-autofill,
+  .tf-input:-webkit-autofill:hover, 
+  .tf-input:-webkit-autofill:focus, 
+  .tf-input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px var(--bg-color) inset !important;
+    -webkit-text-fill-color: var(--accent-color) !important;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+
+  .description {
+    font-size: 18px;
+    color: rgba(0, 0, 0, 0.6);
+    margin-left: 35px;
+    margin-bottom: 30px;
+  }
+
+  .input-wrapper {
+    margin-left: 35px;
+    margin-bottom: 30px;
+    width: 100%;
+    max-width: 750px;
+  }
+
+  .input-label {
+    display: block;
+    font-size: 18px;
+    color: var(--text-color);
+    margin-bottom: 8px;
+  }
+
+  .tf-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--input-border);
+    color: var(--accent-color);
+    font-size: 24px;
+    padding: 10px 0;
+    outline: none;
+    -webkit-appearance: none; /* Removes mobile default styles causing black lines */
+    border-radius: 0; /* Prevents edge artifacts on mobile browsers */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .tf-input:focus {
+    outline: none !important;
+    border-bottom: 1px solid var(--input-border);
+    box-shadow: 0 1px 0 0 var(--accent-color);
+  }
+
+  .tf-input::placeholder {
+    color: rgba(0, 0, 0, 0.3);
+  }
+
+  .button-wrapper {
+    margin-left: 35px;
+    margin-top: 30px;
+    display: flex;
+    align-items: center;
+  }
+
+  .btn-submit {
+    background-color: var(--accent-color);
+    color: rgba(255, 255, 255, 0.85);
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s ease, transform 0.2s ease, color 0.2s ease;
+  }
+
+  .btn-submit:hover {
+    background-color: #021720;
+    transform: scale(1.02);
+    color: #ffffff;
+  }
+
+  .hint {
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.5);
+    margin-left: 15px;
+  }
+
+  /* Multiple Choice Options */
+  .choice-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-left: 35px;
+    margin-bottom: 30px;
+    max-width: 350px;
+  }
+
+  .choice-label {
+    display: flex;
+    align-items: center;
+    background-color: rgba(3, 35, 48, 0.03); 
+    border: 1px solid rgba(3, 35, 48, 0.15); 
+    border-radius: 25px; 
+    padding: 10px 20px; 
+    cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    font-size: 18px; 
+    color: var(--accent-color);
+  }
+
+  .choice-label:hover {
+    transform: scale(1.01);
+    background-color: rgba(3, 35, 48, 0.08); 
+  }
+
+  .choice-label input[type="radio"] {
+    opacity: 0;
+    position: absolute;
+    width: 0;
+    height: 0;
+  }
+
+  .choice-letter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px; 
+    height: 20px; 
+    border: 1px solid var(--accent-color);
+    border-radius: 50%;
+    margin-right: 12px;
+    font-size: 12px; 
+    font-weight: bold;
+    color: var(--accent-color);
+    background-color: #fff;
+    transition: all 0.2s ease;
+  }
+
+  .choice-label:has(input[type="radio"]:checked) {
+    background-color: #ffffff;
+    border-color: var(--accent-color);
+    box-shadow: 0 2px 8px rgba(3, 35, 48, 0.1);
+  }
+  
+  .choice-label:has(input[type="radio"]:checked) .choice-letter {
+    background-color: var(--accent-color);
+    color: #fff;
+  }
+
+  /* Q5 Scale Container */
+  .scale-container {
+    display: flex;
+    gap: 12px;
+    margin-left: 35px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    max-width: 800px;
+  }
+
+  .scale-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    background-color: rgba(3, 35, 48, 0.03);
+    border: 1px solid rgba(3, 35, 48, 0.15);
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    color: var(--accent-color);
+    transition: all 0.2s ease;
+  }
+  .scale-label:hover {
+    transform: scale(1.05);
+    background-color: rgba(3, 35, 48, 0.08);
+  }
+  .scale-label input[type="radio"] {
+    opacity: 0;
+    position: absolute;
+    width: 0;
+    height: 0;
+  }
+  .scale-label:has(input[type="radio"]:checked) {
+    background-color: var(--accent-color);
+    color: #fff;
+    border-color: var(--accent-color);
+  }
+
+  /* Q6 Yes/No Descriptive */
+  .statement-list {
+    margin-left: 35px;
+    margin-bottom: 20px;
+    font-size: 20px; /* Matches the question header text size */
+    color: var(--text-color);
+    max-width: 700px;
+    line-height: 1.5;
+  }
+  .statement-list p { margin: 8px 0; }
+
+  /* Q8 Custom Dropdown */
+  .custom-dropdown-container {
+    margin-left: 35px;
+    margin-bottom: 30px;
+    width: 100%;
+    max-width: 750px;
+    position: relative;
+    z-index: 100;
+  }
+  .custom-dropdown-header {
+    display: flex;
+    align-items: center;
+    position: relative;
+  }
+  .custom-dropdown-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--input-border);
+    color: var(--accent-color);
+    font-size: 24px;
+    padding: 10px 0;
+    outline: none;
+    -webkit-appearance: none; /* Removes mobile default styles causing black lines */
+    border-radius: 0; /* Prevents edge artifacts on mobile browsers */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  .custom-dropdown-input:focus {
+    outline: none !important;
+    border-bottom: 1px solid var(--input-border);
+    box-shadow: 0 1px 0 0 var(--accent-color);
+  }
+  .custom-dropdown-input::placeholder {
+    color: rgba(0, 0, 0, 0.3);
+  }
+  .custom-dropdown-icon {
+    position: absolute;
+    right: 0;
+    bottom: 12px;
+    color: var(--accent-color);
+    pointer-events: none;
+  }
+  .custom-dropdown-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 10000;
+    background-color: var(--bg-color);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    border-radius: 12px;
+    margin-top: 8px;
+    padding: 15px;
+    max-height: 40vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    border: 1px solid rgba(3, 35, 48, 0.1);
+  }
+  .custom-dropdown-list::-webkit-scrollbar {
+    width: 8px;
+  }
+  .custom-dropdown-list::-webkit-scrollbar-track {
+    background: rgba(3, 35, 48, 0.05);
+    border-radius: 10px;
+    margin: 15px 0;
+    border-right: 2px solid transparent;
+    background-clip: padding-box;
+  }
+  .custom-dropdown-list::-webkit-scrollbar-thumb {
+    background: var(--accent-color);
+    border-radius: 10px;
+    border-right: 2px solid transparent;
+    background-clip: padding-box;
+  }
+  .dropdown-item {
+    display: flex;
+    align-items: center;
+    background-color: rgba(3, 35, 48, 0.03);
+    border: 1px solid rgba(3, 35, 48, 0.15);
+    border-radius: 25px;
+    padding: 14px 20px;
+    font-size: 18px;
+    color: var(--accent-color);
+    cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+  }
+  .dropdown-item:hover {
+    transform: scale(1.01);
+    background-color: #ffffff;
+    border-color: rgba(3, 35, 48, 0.2);
+    box-shadow: 0 2px 8px rgba(3, 35, 48, 0.05);
+  }
+
+  /* Progress Bar */
+  .progress-bar-wrapper {
+    position: fixed;
+    top: 3px;
+    left: 4px;
+    right: 4px;
+    height: 4px;
+    background-color: rgba(3, 35, 48, 0.15);
+    border-radius: 4px;
+    z-index: 1000;
+    pointer-events: none;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background-color: var(--accent-color);
+    border-radius: 4px;
+    width: 0%;
+    transition: width 0.4s ease;
+  }
+
+  /* Navigation Pill (Bottom Right) */
+  .nav-pill {
+    position: fixed;
+    bottom: 30px;
+    right: 35px;
+    display: flex;
+    background-color: var(--accent-color);
+    border-radius: 8px;
+    overflow: hidden;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .nav-btn {
+    background-color: transparent;
+    border: none;
+    color: #ffffff;
+    padding: 10px 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease, opacity 0.2s ease;
+  }
+  
+  .nav-btn:hover:not(:disabled) {
+    background-color: rgba(255, 255, 255, 0.15);
+  }
+  
+  .nav-btn.up {
+    border-right: 2px solid var(--bg-color); /* Creates the clean separation line */
+  }
+  
+  .nav-btn svg {
+    width: 24px;
+    height: 24px;
+  }
+  
+  
+  .nav-btn:disabled {
+    color: #888888;
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  /* Booking Calendar Custom Styles */
+  .booking-calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+  .booking-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; cursor: pointer; border: 1px solid transparent; transition: all 0.2s; border-radius: 6px; }
+  .booking-day:hover:not(.empty) { background: rgba(3, 35, 48, 0.08); }
+  .booking-day.selected { background: var(--accent-color); color: var(--bg-color); font-weight: bold; }
+  .booking-day.empty { pointer-events: none; }
+  .booking-day.disabled { opacity: 0.2; cursor: not-allowed; pointer-events: none; }
+
+  .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+  .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+  .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(3, 35, 48, 0.2); border-radius: 10px; }
+  
+  .mobile-break {
+      display: none;
+  }
+
+  #timeSlotsContainer {
+      transition: height 0.5s ease-in-out, opacity 0.5s ease-in-out, max-width 0.5s ease-in-out, margin 0.5s ease-in-out;
+      max-width: 0;
+      height: 0; /* Explicit height fixes transition jitter */
+      opacity: 0;
+      overflow: hidden;
+  }
+  #timeSlotsContainer.open {
+      max-width: 400px;
+      height: 400px; /* Explicit desktop height */
+      opacity: 1;
+      margin-left: 2rem;
+  }
+
+  /* --- Mobile Layout Optimizations --- */
+  @media (max-width: 768px) {
+      /* Center questions on the vertical axis */
+      .step {
+          align-items: center;
+          justify-content: center;
+          overflow-y: auto;
+          height: 100dvh; /* Mobile browser height fix */
+      }
+      
+      .step-content {
+          padding: 24px 20px;
+          margin-top: 0;
+          padding-bottom: 80px; /* Prevents nav pill from hiding content */
+      }
+
+      /* Stack question number and text */
+      .question-header {
+          flex-direction: column;
+          align-items: flex-start;
+      }
+      
+      .question-number {
+          margin-bottom: 12px;
+          margin-right: 0;
+          
+          /* MOBILE SPECIFIC SETTINGS - TWEAK THESE FOR MOBILE INDEPENDENTLY */
+          min-width: 18px; 
+          height: 20px; 
+          border-radius: 7px 4px 7px 4px; /* Corner roundness (Top-Left, Top-Right, Bottom-Right, Bottom-Left) */
+          font-size: 11px; 
+          padding: 0 2px;
+      }
+
+      /* Make OK buttons stretch across mobile screen */
+      .button-wrapper {
+          width: 100%;
+          flex-direction: column;
+          align-items: stretch;
+      }
+      .btn-submit {
+          width: 100%;
+          text-align: center;
+          display: flex;
+          justify-content: center;
+      }
+      .hint {
+          display: none; /* Hides 'press Enter' text on mobile completely */
+      }
+
+      /* Snap all elements to the left edge of the centered imaginary container */
+      .description, 
+      .input-wrapper, 
+      .button-wrapper, 
+      .choice-container, 
+      .statement-list, 
+      .custom-dropdown-container {
+          margin-left: 0;
+          width: 100%;
+      }
+
+      /* Perfect 6-5 staggered pyramid layout for Q5 scale on mobile */
+      .scale-container {
+          margin-left: 0;
+          width: 100%;
+          justify-content: center; 
+          gap: 6px; /* Balanced gap to allow larger circles */
+      }
+      .scale-label {
+          width: 52px; /* Increased to fully and easily occupy mobile screen width */
+          height: 52px;
+          font-size: 20px;
+      }
+      .mobile-break {
+          display: block;
+          flex-basis: 100%;
+          height: 0;
+          margin: 0;
+      }
+
+      /* Shrink nav pill slightly for mobile */
+      .nav-pill {
+          bottom: 20px;
+          right: 20px;
+          transform: scale(0.9);
+          transform-origin: bottom right;
+      }
+      
+      /* Mobile Calendar & Time Slot Adjustments */
+      #step-10 {
+          overflow: hidden; /* Fixed on screen, prevents the whole view from scrolling up */
+      }
+      #step-10 .step-content {
+          margin-top: 0;
+          padding-bottom: 0;
+      }
+      
+      #timeSlotsContainer.open {
+          max-width: 100%;
+          height: 310px; /* Absolute fixed height completely eliminates sliding jitter */
+          margin-left: 0;
+          margin-top: 1.5rem;
+      }
+      
+      #timeSlotsList {
+          height: 250px !important; /* Fixed height protects list */
+      }
+
+      .time-slot-btn {
+          padding: 10px;
+      }
+  }
+</style>
 </head>
-<body class="bg-black text-white h-screen flex overflow-hidden">
+<body>
 
-    <!-- Progress Bar -->
-    <div class="absolute top-0 left-0 h-1 bg-white transition-all duration-500 z-50" id="progressBar" style="width: 25%;"></div>
+<form id="main-form" action="/your-backend-api" method="POST">
+  <div class="progress-bar-wrapper">
+    <div class="progress-bar-fill" id="progress-bar"></div>
+  </div>
+  
+  <div class="nav-pill">
+    <button type="button" class="nav-btn up" id="nav-up" aria-label="Previous">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+    </button>
+    <button type="button" class="nav-btn down" id="nav-down" aria-label="Next">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+    </button>
+  </div>
 
-    <!-- Main Container (Form) -->
-    <div id="mainLayout" class="flex w-full h-full">
-        <!-- Left Panel: Content -->
-        <div id="leftPanel" class="w-full lg:w-1/2 h-full flex flex-col p-8 md:p-12 md:pb-36 relative z-10 bg-black transition-all duration-700 overflow-y-auto">
-            <div class="flex-grow flex flex-col justify-center md:justify-start pt-16 md:pt-[12vh] max-w-lg mx-auto w-full">
-                <form id="leadForm">
-                    <div class="step-content active flex-col space-y-4" data-step="1">
-                        <span class="text-zinc-600 font-medium tracking-widest uppercase text-[10px] md:text-xs">01 — Identity</span>
-                        <h1 class="text-2xl md:text-3xl font-light leading-tight">Which best describes you?</h1>
-                        <div class="grid grid-cols-1 gap-2 pt-1" id="q1-options">
-                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="selectSingleChoice(this, 1)">Content Creator</div>
-                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="selectSingleChoice(this, 1)">Business / Brand</div>
-                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="selectSingleChoice(this, 1)">Agency</div>
-                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="selectSingleChoice(this, 1)">Influencer</div>
-                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg flex flex-col items-start gap-1.5" onclick="selectOtherChoice(this, 1)">
-                                <span>Other</span>
-                                <input type="text" class="input-underline text-sm hidden !py-1" placeholder="Type here..." onclick="event.stopPropagation()" oninput="validateOther(this, 1)">
-                            </div>
-                        </div>
-                        <button type="button" onclick="nextStep()" class="bg-white text-black px-6 py-2.5 text-sm rounded-full font-semibold w-fit hover:bg-zinc-200 transition mt-3 opacity-50 cursor-not-allowed pointer-events-none" id="btn-next-1">Next Step →</button>
-                    </div>
+  <div id="form-container">
 
-                    <div class="step-content flex-col space-y-4" data-step="2">
-                        <span class="text-zinc-600 font-medium tracking-widest uppercase text-[10px] md:text-xs">02 — Platform</span>
-                        <h1 class="text-2xl md:text-3xl font-light leading-tight">Where do you mainly post content? <span class="text-xs text-zinc-500 block mt-1">(Select multiple)</span></h1>
-                        <div class="grid grid-cols-1 gap-2 pt-1" id="q2-options">
-                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="toggleMultiChoice(this, 2)">Instagram</div>
-                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="toggleMultiChoice(this, 2)">TikTok</div>
-                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="toggleMultiChoice(this, 2)">YouTube</div>
-                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="toggleMultiChoice(this, 2)">LinkedIn</div>
-                        </div>
-                        <button type="button" onclick="nextStep()" class="bg-white text-black px-6 py-2.5 text-sm rounded-full font-semibold w-fit hover:bg-zinc-200 transition mt-3 opacity-50 cursor-not-allowed pointer-events-none" id="btn-next-2">Next Step →</button>
-                    </div>
-
-                    <div class="step-content flex-col space-y-4" data-step="3">
-                        <span class="text-zinc-600 font-medium tracking-widest uppercase text-[10px] md:text-xs">03 — Content Type</span>
-                        <h1 class="text-2xl md:text-3xl font-light leading-tight">What kind of content do you create? <span class="text-xs text-zinc-500 block mt-1">(Select multiple)</span></h1>
-                        <div class="grid grid-cols-1 gap-2 pt-1" id="q3-options">
-                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="toggleMultiChoice(this, 3)">Podcasts / interviews</div>
-                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="toggleMultiChoice(this, 3)">Youtube Videos</div>
-                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="toggleMultiChoice(this, 3)">Reels / short-form</div>
-                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="toggleMultiChoice(this, 3)">Ads / promotional</div>
-                        </div>
-                        <button type="button" onclick="nextStep()" class="bg-white text-black px-6 py-2.5 text-sm rounded-full font-semibold w-fit hover:bg-zinc-200 transition mt-3 opacity-50 cursor-not-allowed pointer-events-none" id="btn-next-3">Next Step →</button>
-                    </div>
-
-                    <div class="step-content flex-col space-y-4" data-step="4">
-                        <span class="text-zinc-600 font-medium tracking-widest uppercase text-[10px] md:text-xs">04 — Volume</span>
-                        <h1 class="text-2xl md:text-3xl font-light leading-tight">How much content do you make?</h1>
-                        <div class="grid grid-cols-1 gap-2 pt-1" id="q4-options">
-                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="selectSingleChoice(this, 4)">1–5 videos/month</div>
-                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="selectSingleChoice(this, 4)">5–15 videos/month</div>
-                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="selectSingleChoice(this, 4)">15+ videos/month</div>
-                        </div>
-                    </div>
-
-                    <div class="step-content flex-col space-y-4" data-step="5">
-                        <span class="text-zinc-600 font-medium tracking-widest uppercase text-[10px] md:text-xs">05 — Pain Points</span>
-                        <h1 class="text-2xl md:text-3xl font-light leading-tight">What’s the biggest problem with your content right now?</h1>
-                        <div class="grid grid-cols-1 gap-2 pt-1" id="q5-options">
-                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="selectSingleChoice(this, 5)">Takes too long to edit</div>
-                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="selectSingleChoice(this, 5)">Doesn’t look professional</div>
-                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="selectSingleChoice(this, 5)">Not getting engagement</div>
-                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="selectSingleChoice(this, 5)">Inconsistent posting</div>
-                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg flex flex-col items-start gap-1.5" onclick="selectOtherChoice(this, 5)">
-                                <span>Other</span>
-                                <input type="text" class="input-underline text-sm hidden !py-1" placeholder="Optional short text..." onclick="event.stopPropagation()" oninput="validateOther(this, 5)">
-                            </div>
-                        </div>
-                        <button type="button" onclick="nextStep()" class="bg-white text-black px-6 py-2.5 text-sm rounded-full font-semibold w-fit hover:bg-zinc-200 transition mt-3 opacity-50 cursor-not-allowed pointer-events-none" id="btn-next-5">Next Step →</button>
-                    </div>
-
-                    <div class="step-content flex-col space-y-4" data-step="6">
-                        <span class="text-zinc-600 font-medium tracking-widest uppercase text-[10px] md:text-xs">06 — Style</span>
-                        <h1 class="text-2xl md:text-3xl font-light leading-tight">What kind of editing style do you prefer?</h1>
-                        <div class="grid grid-cols-1 gap-2 pt-1" id="q6-options">
-                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="selectSingleChoice(this, 6)">Clean & minimal</div>
-                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="selectSingleChoice(this, 6)">Fast-paced / viral style</div>
-                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="selectSingleChoice(this, 6)">Cinematic / premium</div>
-                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="selectSingleChoice(this, 6)">Not sure (need guidance)</div>
-                        </div>
-                    </div>
-
-                    <div class="step-content flex-col space-y-4" data-step="7">
-                        <span class="text-zinc-600 font-medium tracking-widest uppercase text-[10px] md:text-xs">07 — Budget</span>
-                        <h1 class="text-2xl md:text-3xl font-light leading-tight">What is your budget?</h1>
-                        <div class="grid grid-cols-1 gap-2 pt-1" id="q7-options">
-                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="selectSingleChoice(this, 7)">$500-$2,000/monthly</div>
-                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="selectSingleChoice(this, 7)">$2,000-$3,000/monthly</div>
-                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="selectSingleChoice(this, 7)">$3,000-$4,000/monthly</div>
-                            <div class="choice-card py-2.5 px-4 text-sm rounded-lg" onclick="selectSingleChoice(this, 7)">$4,000-$5,000/monthly</div>
-                        </div>
-                    </div>
-
-                    <div class="step-content flex-col space-y-4" data-step="8">
-                        <span class="text-zinc-600 font-medium tracking-widest uppercase text-[10px] md:text-xs">08 — Name</span>
-                        <h1 class="text-2xl md:text-3xl font-light leading-tight">What's your good name?</h1>
-                        <input type="text" id="nameInput" class="input-underline !py-1.5 !text-lg" placeholder="Type your answer here..." autocomplete="off" oninput="validateInput(this, 8)">
-                        <button type="button" onclick="nextStep()" class="bg-white text-black px-6 py-2.5 text-sm rounded-full font-semibold w-fit hover:bg-zinc-200 transition mt-3 opacity-50 cursor-not-allowed pointer-events-none" id="btn-next-8">Next Step →</button>
-                    </div>
-
-                    <div class="step-content flex-col space-y-4" data-step="9">
-                        <span class="text-zinc-600 font-medium tracking-widest uppercase text-[10px] md:text-xs">09 — Contact</span>
-                        <h1 class="text-2xl md:text-3xl font-light leading-tight">Lastly, what's your Gmail?</h1>
-                        <input type="email" id="emailInput" class="input-underline !py-1.5 !text-lg" placeholder="name@gmail.com" autocomplete="off" oninput="validateEmail(this, 9)">
-                        <button type="button" onclick="finishQualification()" class="bg-white text-black px-6 py-2.5 text-sm rounded-full font-semibold w-fit hover:bg-zinc-200 transition mt-3 opacity-50 cursor-not-allowed pointer-events-none" id="btn-next-9">Confirm & Schedule</button>
-                    </div>
-                </form>
-            </div>
-
-            <div id="navButtons" class="fixed bottom-8 right-8 lg:right-[calc(50%+2rem)] flex space-x-1 z-50">
-                <button onclick="prevStep()" class="bg-zinc-950 p-4 rounded-l-lg hover:bg-zinc-900 border border-zinc-800 transition shadow-lg">
-                    <svg width="14" height="14" viewBox="0 0 12 12" fill="white"><path d="M6 1l-5 5 5 5V1z"/></svg>
-                </button>
-                <button onclick="nextStep()" id="nextChevron" class="bg-zinc-950 p-4 rounded-r-lg hover:bg-zinc-900 border border-zinc-800 border-l-0 transition opacity-30 pointer-events-none">
-                    <svg width="14" height="14" viewBox="0 0 12 12" fill="white"><path d="M6 1l5 5-5 5V1z"/></svg>
-                </button>
-            </div>
+    <div class="step active" id="step-1">
+      <div class="step-content">
+        <div class="question-header">
+          <span class="question-number">1</span>
+          <span>We only onboard two new clients per month. Please fill out this form if you are serious about organic content </span>
         </div>
-
-        <div id="rightPanel" class="hidden lg:flex w-1/2 h-full bg-black items-center justify-center p-20 relative transition-all duration-700">
-            <div class="absolute left-0 top-1/4 bottom-1/4 w-[1px] bg-gradient-to-b from-transparent via-zinc-800 to-transparent" id="dividerLine"></div>
-            <div id="logoContainer" class="flex flex-col items-center transition-all duration-700 w-full">
-                <img src="https://res.cloudinary.com/dobnqmfsg/image/upload/v1772612374/Untitled_design__1_-removebg-preview_ux1end.png" 
-                     alt="Logo" 
-                     id="mainLogo"
-                     class="w-full max-w-[280px] h-auto object-contain opacity-90 drop-shadow-[0_0_15px_rgba(255,255,255,0.05)] transition-all duration-700">
-            </div>
+        <div class="description">we'll reach out to see if it's a fit.</div>
+        
+        <div class="input-wrapper">
+          <label class="input-label">First name </label>
+          <input type="text" name="first_name" class="tf-input" placeholder="Jane" required autofocus>
         </div>
+        <div class="input-wrapper">
+          <label class="input-label">Last name </label>
+          <input type="text" name="last_name" class="tf-input" placeholder="Smith" required>
+        </div>
+        <div class="input-wrapper">
+          <label class="input-label">Company</label>
+          <input type="text" name="company" class="tf-input" placeholder="Acme Corporation" required>
+        </div>
+        
+        <div class="button-wrapper">
+          <button type="button" class="btn-submit next-btn">OK</button>
+          <span class="hint">press <strong>Enter ↵</strong></span>
+        </div>
+      </div>
     </div>
 
-    <!-- Step 5: Full Screen Booking Interface -->
-    <div id="bookingInterface" class="hidden fixed inset-0 z-40 bg-black flex-col items-center px-8 pt-2 pb-8 overflow-y-auto animate-fade-in">
-<div id="topLogoAnchor" class="w-24 mt-0 mb-4 flex justify-center"></div>
+    <div class="step" id="step-2">
+      <div class="step-content">
+        <div class="question-header">
+          <span class="question-number">2</span>
+          <span>What's your company website?</span>
+        </div>
+        
+        <div class="input-wrapper">
+          <input type="url" name="website" class="tf-input" placeholder="https://" required>
+        </div>
+        
+        <div class="button-wrapper">
+          <button type="button" class="btn-submit next-btn">OK</button>
+          <span class="hint">press <strong>Enter ↵</strong></span>
+        </div>
+      </div>
+    </div>
 
-        <div class="flex flex-col md:flex-row items-start justify-center w-full max-w-5xl mx-auto gap-6 relative mt-0">
+    <div class="step" id="step-3">
+      <div class="step-content">
+        <div class="question-header">
+          <span class="question-number">3</span>
+          <span>What is the size of your company? </span>
+        </div>
+        
+        
+        <div class="choice-container">
+          <label class="choice-label">
+            <input type="radio" name="company_size" value="Small" required>
+            <span class="choice-letter">A</span>
+            <span class="choice-text">Small (1-50 employees)</span>
+          </label>
+          <label class="choice-label">
+            <input type="radio" name="company_size" value="Medium" required>
+            <span class="choice-letter">B</span>
+            <span class="choice-text">Medium (51-500 employees)</span>
+          </label>
+          <label class="choice-label">
+            <input type="radio" name="company_size" value="Large" required>
+            <span class="choice-letter">C</span>
+            <span class="choice-text">Large (501+ employees)</span>
+          </label>
+        </div>
+        
+        <div class="button-wrapper">
+          <button type="button" class="btn-submit next-btn">OK</button>
+          <span class="hint">press <strong>Enter ↵</strong></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="step" id="step-4">
+      <div class="step-content">
+        <div class="question-header">
+          <span class="question-number">4</span>
+          <span>What is your company's annual revenue? </span>
+        </div>
+        <div class="choice-container">
+          <label class="choice-label"><input type="radio" name="revenue" value="under $5M" required><span class="choice-letter">A</span><span class="choice-text">under $5M</span></label>
+          <label class="choice-label"><input type="radio" name="revenue" value="$5M-10M" required><span class="choice-letter">B</span><span class="choice-text">$5M-10M</span></label>
+          <label class="choice-label"><input type="radio" name="revenue" value="$10M - $25M" required><span class="choice-letter">C</span><span class="choice-text">$10M - $25M</span></label>
+          <label class="choice-label"><input type="radio" name="revenue" value="$25M - $100M" required><span class="choice-letter">D</span><span class="choice-text">$25M - $100M</span></label>
+          <label class="choice-label"><input type="radio" name="revenue" value="$100M - $1B" required><span class="choice-letter">E</span><span class="choice-text">$100M - $1B</span></label>
+          <label class="choice-label"><input type="radio" name="revenue" value="1B+" required><span class="choice-letter">F</span><span class="choice-text">1B+</span></label>
+        </div>
+        <div class="button-wrapper">
+          <button type="button" class="btn-submit next-btn">OK</button>
+          <span class="hint">press <strong>Enter ↵</strong></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="step" id="step-5">
+      <div class="step-content">
+        <div class="question-header">
+          <span class="question-number">5</span>
+          <span>How committed are you to investing in long-term success with organic content? </span>
+        </div>
+        <div class="scale-container">
+          <label class="scale-label"><input type="radio" name="commitment" value="0" required>0</label>
+          <label class="scale-label"><input type="radio" name="commitment" value="1" required>1</label>
+          <label class="scale-label"><input type="radio" name="commitment" value="2" required>2</label>
+          <label class="scale-label"><input type="radio" name="commitment" value="3" required>3</label>
+          <label class="scale-label"><input type="radio" name="commitment" value="4" required>4</label>
+          <label class="scale-label"><input type="radio" name="commitment" value="5" required>5</label>
+          <div class="mobile-break"></div>
+          <label class="scale-label"><input type="radio" name="commitment" value="6" required>6</label>
+          <label class="scale-label"><input type="radio" name="commitment" value="7" required>7</label>
+          <label class="scale-label"><input type="radio" name="commitment" value="8" required>8</label>
+          <label class="scale-label"><input type="radio" name="commitment" value="9" required>9</label>
+          <label class="scale-label"><input type="radio" name="commitment" value="10" required>10</label>
+        </div>
+        <div class="button-wrapper">
+          <button type="button" class="btn-submit next-btn">OK</button>
+          <span class="hint">press <strong>Enter ↵</strong></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="step" id="step-6">
+      <div class="step-content">
+        <div class="question-header">
+          <span class="question-number">6</span>
+          <span>Do both of these two statements describe you? </span>
+        </div>
+        <div class="description">Choose "no" if only one of these or none describe you</div>
+        <div class="statement-list">
+          <p>1. We believe strong organic content will play an important role in advancing our brand and deepening relationships with customers.</p>
+          <p>2. We are commited to organic content long-term and thus believe it is a competency we should develop internally.</p>
+        </div>
+        <div class="choice-container">
+          <label class="choice-label"><input type="radio" name="statements_agree" value="Yes" required><span class="choice-letter">Y</span><span class="choice-text">Yes</span></label>
+          <label class="choice-label"><input type="radio" name="statements_agree" value="No" required><span class="choice-letter">N</span><span class="choice-text">No</span></label>
+        </div>
+        <div class="button-wrapper">
+          <button type="button" class="btn-submit next-btn">OK</button>
+          <span class="hint">press <strong>Enter ↵</strong></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="step" id="step-7">
+      <div class="step-content">
+        <div class="question-header">
+          <span class="question-number">7</span>
+          <span>Email address to contact you: </span>
+        </div>
+        <div class="input-wrapper">
+          <input type="email" name="email" class="tf-input" placeholder="name@example.com" required>
+        </div>
+        <div class="button-wrapper">
+          <button type="button" class="btn-submit next-btn">OK</button>
+          <span class="hint">press <strong>Enter ↵</strong></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="step" id="step-8">
+      <div class="step-content">
+        <div class="question-header">
+          <span class="question-number">8</span>
+          <span>How did you hear about us? </span>
+        </div>
+        <div class="custom-dropdown-container">
+          
+          <div class="custom-dropdown-header">
+            <input type="text" id="q8-input" class="custom-dropdown-input" placeholder="Type or select an option" autocomplete="off" required>
+            <svg class="custom-dropdown-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </div>
+          <div id="q8-list" class="custom-dropdown-list" style="display: none;">
+            <div class="dropdown-item" data-value="Linkedin">Linkedin</div>
+            <div class="dropdown-item" data-value="Twitter">Twitter</div>
+            <div class="dropdown-item" data-value="Instagram">Instagram</div>
+            <div class="dropdown-item" data-value="TikTok">TikTok</div>
+            <div class="dropdown-item" data-value="Youtube">Youtube</div>
+            <div class="dropdown-item" data-value="Referral">Referral</div>
+            <div class="dropdown-item" data-value="Google">Google</div>
+            <div class="dropdown-item" data-value="Other">Other</div>
+          </div>
+          <input type="hidden" name="how_did_you_hear" id="q8-hidden">
+        </div>
+        <div class="button-wrapper">
+          <button type="button" class="btn-submit next-btn">OK</button>
+          <span class="hint">press <strong>Enter ↵</strong></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="step" id="step-9">
+      <div class="step-content">
+        <div class="question-header">
+          <span class="question-number">9</span>
+          <span>Anything else we should know?</span>
+        </div>
+        <div class="input-wrapper">
+          <input type="text" name="anything_else" class="tf-input" placeholder="Type your answer here..." required>
+        </div>
+        <div class="button-wrapper">
+          <button type="submit" class="btn-submit">Next</button>
+          <span class="hint">press <strong>Enter ↵</strong></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="step" id="step-10">
+      <div class="step-content" style="max-width: 900px; width: 100%; padding-top: 0; padding-bottom: 0;">
+        <div class="flex flex-col items-center justify-center w-full">
+          <img src="https://res.cloudinary.com/dobnqmfsg/image/upload/q_auto/f_auto/v1776510599/Untitled_design__3_-removebg-preview_xoxdtc.png" alt="Logo" class="w-16 mb-4 mt-0">
+          <div class="flex flex-col md:flex-row items-start justify-center w-full gap-4">
             
-            <div class="w-full max-w-md bg-[#050505] p-8 rounded-2xl border border-white/10 shadow-2xl">
-                <div class="mb-8 flex justify-between items-center relative z-[5000]">
-                    <h1 class="text-xl font-bold uppercase tracking-widest text-white">Select Date</h1>
+            <div class="w-full max-w-[380px] bg-white p-4 rounded-2xl border border-[rgba(3,35,48,0.1)] shadow-2xl">
+                <div class="mb-3 flex justify-between items-center relative z-[5000]">
+                    <h1 class="text-base font-bold capitalize tracking-wide text-[var(--accent-color)]">Select Date</h1>
                     <div class="relative w-48">
-                        <div id="tz-dropdown-btn" onclick="toggleTzDropdown()" class="bg-zinc-900 border border-white/10 rounded-full px-4 py-2 flex items-center justify-between shadow-[0_0_20px_rgba(255,255,255,0.05)] cursor-pointer w-full group hover:border-white/30 transition-all">
+                        <div id="tz-dropdown-btn" onclick="toggleTzDropdown()" class="bg-[rgba(3,35,48,0.03)] border border-[rgba(3,35,48,0.1)] rounded-full px-4 py-2 flex items-center justify-between cursor-pointer w-full group hover:border-[rgba(3,35,48,0.3)] transition-all">
                             <div class="flex items-center space-x-2 overflow-hidden w-full">
-                                <i data-lucide="globe" class="w-3.5 h-3.5 text-white shrink-0"></i>
-                                <span id="tz-selected-text" class="text-[10px] text-white font-light tracking-wide truncate pointer-events-none w-full text-left">Loading...</span>
+                                <i data-lucide="globe" class="w-3.5 h-3.5 text-[var(--accent-color)] shrink-0"></i>
+                                <span id="tz-selected-text" class="text-[10px] text-[var(--accent-color)] font-light tracking-wide truncate pointer-events-none w-full text-left">Loading...</span>
                             </div>
-                            <i data-lucide="chevron-down" id="tz-chevron" class="w-3 h-3 text-white/40 ml-2 shrink-0 transition-transform duration-200 pointer-events-none"></i>
+                            <i data-lucide="chevron-down" id="tz-chevron" class="w-3 h-3 text-[var(--accent-color)] ml-2 shrink-0 transition-transform duration-200 pointer-events-none"></i>
                         </div>
-                        <div id="tz-dropdown-menu" class="hidden absolute top-full right-0 mt-2 w-64 bg-[#0a0a0a] border border-white/10 rounded-2xl shadow-2xl z-[6000] flex flex-col overflow-hidden">
-                            <div class="p-2 border-b border-white/10">
-                                <input type="text" id="tz-search" oninput="filterTimezones()" placeholder="Search city or timezone..." class="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-[10px] text-white font-light focus:outline-none focus:border-white/30 transition-colors">
+                        <div id="tz-dropdown-menu" class="hidden absolute top-full right-0 mt-2 w-64 bg-white border border-[rgba(3,35,48,0.1)] rounded-2xl shadow-2xl z-[6000] flex flex-col overflow-hidden">
+                            <div class="p-2 border-b border-[rgba(3,35,48,0.1)]">
+                                <input type="text" id="tz-search" oninput="filterTimezones()" placeholder="Search city or timezone..." class="w-full bg-[rgba(3,35,48,0.03)] border border-[rgba(3,35,48,0.1)] rounded-xl px-3 py-2 text-[10px] text-[var(--accent-color)] font-light focus:outline-none focus:border-[var(--accent-color)] transition-colors">
                             </div>
-                            <div id="tz-list" class="max-h-64 overflow-y-auto custom-scrollbar flex flex-col p-1 bg-black"></div>
+                            <div id="tz-list" class="max-h-64 overflow-y-auto custom-scrollbar flex flex-col p-1 bg-white"></div>
                         </div>
                     </div>
                 </div>
                 
-                <div class="bg-white/[0.03] border border-white/10 rounded-xl p-4">
+                <div class="bg-[rgba(3,35,48,0.02)] border border-[rgba(3,35,48,0.1)] rounded-xl p-4">
                     <div class="flex justify-between items-center mb-4">
-                        <button onclick="changeBookingMonth(-1)" class="p-1 hover:bg-white/10 rounded text-white/60 hover:text-white transition-colors"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
-                        <h4 id="b-calendar-month-label" class="text-xs font-bold uppercase tracking-widest text-center text-white">Month Year</h4>
-                        <button onclick="changeBookingMonth(1)" class="p-1 hover:bg-white/10 rounded text-white/60 hover:text-white transition-colors"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+                        <button type="button" onclick="changeBookingMonth(-1)" class="p-1 hover:bg-[rgba(3,35,48,0.08)] rounded text-[var(--accent-color)] transition-colors"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+                        <h4 id="b-calendar-month-label" class="text-xs font-bold uppercase tracking-widest text-center text-[var(--accent-color)]">Month Year</h4>
+                        <button type="button" onclick="changeBookingMonth(1)" class="p-1 hover:bg-[rgba(3,35,48,0.08)] rounded text-[var(--accent-color)] transition-colors"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
                     </div>
-                    <div class="booking-calendar-grid text-[10px] text-white/30 uppercase font-bold mb-2 text-center">
+                    <div class="booking-calendar-grid text-[10px] text-[rgba(3,35,48,0.5)] uppercase font-bold mb-2 text-center">
                         <div>S</div><div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div>
                     </div>
-                    <div id="b-calendar-days" class="booking-calendar-grid text-white"></div>
+                    <div id="b-calendar-days" class="booking-calendar-grid text-[var(--accent-color)]"></div>
                 </div>
             </div>
 
-            <div id="timeSlotsContainer" class="w-full flex flex-col relative pt-8">
-                <div class="flex justify-between items-start mb-8 min-h-[60px]">
+            <div id="timeSlotsContainer" class="w-full flex flex-col relative md:pt-0">
+                <div class="flex justify-between items-center mb-3 h-[40px]">
                     <div>
-                        <h3 id="selectedDateLabel" class="text-2xl font-light text-white">March 19, 2024</h3>
-                        <p class="text-zinc-600 text-[10px] tracking-widest uppercase mt-1">Select an available slot (GMT)</p>
+                        <h3 id="selectedDateLabel" class="text-lg font-light text-[var(--accent-color)]">Select a date</h3>
+                        <p class="text-[rgba(3,35,48,0.6)] text-[9px] tracking-widest uppercase mt-0.5">Select an available slot</p>
                     </div>
                     <div id="bookNowBtnContainer" class="hidden">
-                        <button onclick="confirmBooking()" class="bg-white text-black px-6 py-2.5 rounded-full font-semibold w-fit hover:bg-zinc-200 transition text-sm shadow-lg">Book Now →</button>
+                        <button type="button" onclick="confirmBooking()" class="btn-submit flex justify-center items-center" style="padding: 6px 12px; font-size: 13px; min-width: 110px;">Book Now →</button>
                     </div>
                 </div>
-                <div class="space-y-2 max-h-[420px] overflow-y-auto pr-2" id="timeSlotsList">
+                <div class="space-y-2 h-[340px] overflow-y-auto pr-2 custom-scrollbar" id="timeSlotsList">
                 </div>
             </div>
+          </div>
         </div>
-        <div class="h-20"></div> <!-- Spacer -->
+      </div>
     </div>
 
-    <!-- Final Confirmation Message -->
-    <div id="successMessage" class="hidden fixed inset-0 z-50 bg-black flex-col items-center justify-center text-center p-8 animate-fade-in">
-        <div class="w-20 h-20 bg-white text-black rounded-full flex items-center justify-center mb-6">
+    <div class="step" id="step-11">
+      <div class="step-content text-center flex flex-col items-center">
+        <div class="w-20 h-20 bg-[var(--accent-color)] text-white rounded-full flex items-center justify-center mb-6">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
             </svg>
         </div>
-        <h1 class="text-4xl font-light mb-4">You're all set!</h1>
-        <p class="text-zinc-500 max-w-md mx-auto leading-relaxed">We've sent a confirmation email with the meeting details. Our team is excited to help you scale.</p>
+        <h1 class="text-4xl font-light mb-4 text-[var(--accent-color)]">You're all set!</h1>
+        <p class="text-[rgba(3,35,48,0.6)] max-w-md mx-auto leading-relaxed text-lg">We've sent a confirmation email with the meeting details. Our team is excited to help you scale.</p>
+      </div>
     </div>
 
+  </div>
+</form>
+
 <script>
-        window.currentStep = 1;
-        window.totalSteps = 9;
-        
-        window.updateProgress = function() {
-            const percentage = ((window.currentStep - 1) / window.totalSteps) * 100;
-            document.getElementById('progressBar').style.width = (percentage === 0 ? 5 : percentage) + '%';
-        }
+  // Dropdown Logic for Step 8
+  document.addEventListener('DOMContentLoaded', () => {
+    const ddInput = document.getElementById('q8-input');
+    const ddList = document.getElementById('q8-list');
+    const hiddenVal = document.getElementById('q8-hidden');
+    
+    if(ddInput) {
+      const items = ddList.querySelectorAll('.dropdown-item');
 
-        window.showStep = function(step) {
-            document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
-            const activeStep = document.querySelector(`[data-step="${step}"]`);
-            if (activeStep) activeStep.classList.add('active');
-            window.updateProgress();
-            window.checkValidation(step);
-        }
+      ddInput.addEventListener('click', () => {
+        ddList.style.display = 'flex';
+      });
 
-        window.nextStep = function() {
-            if (window.isStepValid(window.currentStep) && window.currentStep < window.totalSteps) {
-                window.currentStep++;
-                window.showStep(window.currentStep);
-            }
-        }
-
-        window.prevStep = function() {
-            if (window.currentStep > 1) {
-                window.currentStep--;
-                window.showStep(window.currentStep);
-            }
-        }
-
-        window.isStepValid = function(step) {
-            const stepEl = document.querySelector(`[data-step="${step}"]`);
-            if (!stepEl) return false;
-            
-            if ([1, 4, 5, 6, 7].includes(step)) {
-                const selected = stepEl.querySelector('.choice-card.selected');
-                if (!selected) return false;
-                const input = selected.querySelector('input');
-                if (input && !input.classList.contains('hidden')) {
-                    if (step === 1 && input.value.trim() === '') return false;
-                }
-                return true;
-            }
-            if (step === 2 || step === 3) {
-                return stepEl.querySelectorAll('.choice-card.selected').length > 0;
-            }
-            if (step === 8) {
-                return document.getElementById('nameInput').value.trim().length > 1;
-            }
-            if (step === 9) {
-                const email = document.getElementById('emailInput').value.trim();
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                return emailRegex.test(email);
-            }
-            return false;
-        }
-
-        window.enableNextButton = function(step) {
-            const btn = document.getElementById(`btn-next-${step}`);
-            if (btn) btn.classList.remove('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
-        }
-
-        window.disableNextButton = function(step) {
-            const btn = document.getElementById(`btn-next-${step}`);
-            if (btn) btn.classList.add('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
-        }
-
-        window.checkValidation = function(step) {
-            if (window.isStepValid(step)) window.enableNextButton(step);
-            else window.disableNextButton(step);
-            
-            const nextChevron = document.getElementById('nextChevron');
-            if (nextChevron) {
-                if (window.isStepValid(step)) {
-                    nextChevron.style.opacity = '1';
-                    nextChevron.style.pointerEvents = 'auto';
-                } else {
-                    nextChevron.style.opacity = '0.3';
-                    nextChevron.style.pointerEvents = 'none';
-                }
-            }
-        }
-
-        window.selectSingleChoice = function(element, step) {
-            const parent = element.closest('.grid');
-            parent.querySelectorAll('.choice-card').forEach(card => {
-                card.classList.remove('selected');
-                const input = card.querySelector('input');
-                if(input) input.classList.add('hidden');
-            });
-            element.classList.add('selected');
-            window.checkValidation(step);
-            if (step !== 1 && step !== 5) {
-                setTimeout(window.nextStep, 500);
-            }
-        }
-
-        window.selectOtherChoice = function(element, step) {
-            const parent = element.closest('.grid');
-            parent.querySelectorAll('.choice-card').forEach(card => {
-                card.classList.remove('selected');
-                const input = card.querySelector('input');
-                if(input && card !== element) input.classList.add('hidden');
-            });
-            element.classList.add('selected');
-            const input = element.querySelector('input');
-            input.classList.remove('hidden');
-            input.focus();
-            window.checkValidation(step);
-        }
-
-        window.toggleMultiChoice = function(element, step) {
-            element.classList.toggle('selected');
-            window.checkValidation(step);
-        }
-
-        window.validateOther = function(input, step) { window.checkValidation(step); }
-        window.validateInput = function(input, step) { window.checkValidation(step); }
-        window.validateEmail = function(input, step) { window.checkValidation(step); }
-
-        window.finishQualification = function() {
-            if(!window.isStepValid(9)) return;
-            const leftPanel = document.getElementById('leftPanel');
-            const rightPanel = document.getElementById('rightPanel');
-            const divider = document.getElementById('dividerLine');
-            const logo = document.getElementById('mainLogo');
-            
-            leftPanel.style.opacity = '0';
-            divider.style.opacity = '0';
-            
-            logo.classList.replace('max-w-[280px]', 'max-w-[100px]');
-            rightPanel.classList.remove('lg:w-1/2');
-            rightPanel.classList.add('w-full', 'items-start', 'pt-12');
-            
-            setTimeout(() => {
-                document.getElementById('mainLayout').classList.add('hidden');
-                document.getElementById('bookingInterface').classList.remove('hidden');
-                document.getElementById('bookingInterface').classList.add('flex');
-                document.getElementById('topLogoAnchor').appendChild(logo);
-                
-                if(window.initTimezones) window.initTimezones();
-                if(window.generateCalendar) window.generateCalendar();
-            }, 600);
-
-            document.getElementById('progressBar').style.width = '100%';
-        }
-
-        document.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                if (document.getElementById('bookingInterface').classList.contains('hidden')) {
-                    if (window.isStepValid(window.currentStep)) {
-                        if (window.currentStep === window.totalSteps) window.finishQualification();
-                        else window.nextStep();
-                    }
-                }
-            }
+      ddInput.addEventListener('input', (e) => {
+        ddList.style.display = 'flex';
+        const val = e.target.value.toLowerCase();
+        items.forEach(item => {
+          if(item.textContent.toLowerCase().includes(val)) {
+            item.style.display = 'block';
+          } else {
+            item.style.display = 'none';
+          }
         });
-        
-        document.addEventListener('DOMContentLoaded', () => {
-            window.showStep(1);
+        hiddenVal.value = e.target.value; // Allow custom typed answer tracking
+      });
+
+      items.forEach(item => {
+        item.addEventListener('click', () => {
+          ddInput.value = item.textContent.trim();
+          hiddenVal.value = item.dataset.value;
+          ddList.style.display = 'none';
+          
+          // Auto-advance
+          setTimeout(() => {
+            goToStep(currentStep + 1);
+          }, 300);
         });
-    </script>
+      });
 
-    <script>
-        // --- CONFIGURATION & SETUP ---
-        var SUPABASE_URL = 'https://ikeyqwtrqaqogecvxmiq.supabase.co'; 
-        var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlrZXlxd3RycWFxb2dlY3Z4bWlxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0OTE0NTYsImV4cCI6MjA4OTA2NzQ1Nn0.6Gp5Y8J2T8gzY44gmcYojP8z028T6OVKOzfNT_1cqi8'; 
-        var TARGET_PROFILE_ID = '45ffdb80-c36d-43ac-bd95-5e84a46b085d';
-        var WEBHOOK_URL = 'https://n8n.norkx.space/webhook/Leadhascoem';
+      // Close dropdown if clicking outside the container
+      document.addEventListener('click', (e) => {
+        if(!e.target.closest('.custom-dropdown-container')) {
+          ddList.style.display = 'none';
+        }
+      });
+    }
+  });
+
+  // The Engine: Handles sliding between questions
+  const container = document.getElementById('form-container');
+  const steps = document.querySelectorAll('.step');
+  const nextBtns = document.querySelectorAll('.next-btn');
+  const progressBar = document.getElementById('progress-bar');
+  let currentStep = 0;
+
+  const navUpBtn = document.getElementById('nav-up');
+  const navDownBtn = document.getElementById('nav-down');
+
+  function updateProgress() {
+    if (progressBar) {
+      const percentage = ((currentStep + 1) / steps.length) * 100;
+      progressBar.style.width = percentage + '%';
+    }
+    // Disable the UP button if we are on the first question
+    if (navUpBtn) {
+      navUpBtn.disabled = (currentStep === 0);
+    }
+  }
+  
+  // Initialize progress bar
+  updateProgress();
+
+  
+  // "Go Back" Navigation Logic
+  if (navUpBtn) {
+    navUpBtn.addEventListener('click', () => {
+      if (currentStep > 0) {
+        // Slide current step down and out
+        steps[currentStep].classList.remove('active', 'reverse');
+        steps[currentStep].classList.add('exit-down');
         
-        var supabaseInstance = null;
-        try {
-            if (window.supabase) {
-                // We disable auth persistence since this is a public form. 
-                // This prevents the "Invalid Refresh Token" console errors.
-                supabaseInstance = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-                    auth: {
-                        persistSession: false,
-                        autoRefreshToken: false,
-                        detectSessionInUrl: false
-                    }
-                });
+        currentStep--;
+        updateProgress();
+        
+        // Wait for the exit animation to finish (500ms) before showing the next question
+        setTimeout(() => {
+          // Reactivate the previous step
+          steps[currentStep].classList.remove('exit-up', 'exit-down');
+          
+          // Force reflow to ensure the entrance animation re-triggers identically
+          void steps[currentStep].offsetWidth;
+          
+          steps[currentStep].classList.add('active', 'reverse');
+        }, 500);
+      }
+    });
+  }
 
-                // Set up Realtime Subscription to instantly reflect availability and meeting changes
-                supabaseInstance.channel('public-booking-changes')
-                    .on('postgres_changes', { event: '*', schema: 'public', table: 'availability' }, payload => {
-                        if (selectedDateStr) fetchAndRenderSlots(selectedDateStr);
-                    })
-                    .on('postgres_changes', { event: '*', schema: 'public', table: 'meeting_participants' }, payload => {
-                        if (selectedDateStr) fetchAndRenderSlots(selectedDateStr);
-                    })
-                    .subscribe();
-            }
-        } catch (e) { console.error("Supabase failed to initialize.", e); }
+  // "Go Forward" Navigation Logic (relies on existing validation)
+  if (navDownBtn) {
+    navDownBtn.addEventListener('click', () => {
+      goToStep(currentStep + 1);
+    });
+  }
 
-        // --- GLOBAL VARIABLES ---
-        var globalTimezoneList = [];
-        var currentUserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
-        var currentBookingYear = new Date().getFullYear();
-        var currentBookingMonth = new Date().getMonth();
-        var selectedDateStr = null;
-        var activeSelectedSlot = null;
-        var availableSlotsCache = [];
+  function goToStep(stepIndex) {
+    // Validate current step inputs before moving
+    const inputs = steps[currentStep].querySelectorAll('input[required], select[required]');
+    for (let input of inputs) {
+      if (!input.checkValidity()) {
+        input.reportValidity();
+        return; // Stop if validation fails
+      }
+    }
 
-        // --- 1. TIMEZONE LOGIC (NATIVE JS CLONED FROM APP) ---
-        function initTimezones() {
-            try {
-                const timezones = Intl.supportedValuesOf('timeZone');
-                const now = new Date();
-                
-                globalTimezoneList = timezones.map(tz => {
-                    const parts = tz.split('/');
-                    const city = parts[parts.length - 1].replace(/_/g, ' ');
-                    const region = parts.length > 1 ? parts[0].replace(/_/g, ' ') : '';
-                    
-                    let gmtOffset = '';
-                    try {
-                        const tzString = now.toLocaleString('en-US', { timeZone: tz, timeZoneName: 'shortOffset' });
-                        const match = tzString.match(/(GMT[+-]?\d*(?::\d{2})?)/);
-                        if (match) gmtOffset = match[1];
-                    } catch(e) {}
-                    
-                    let label = `${city}`;
-                    if (region && region !== city) label += `, ${region}`;
-                    if (gmtOffset) label += ` (${gmtOffset})`;
-                    
-                    return { val: tz, label: label, searchStr: label.toLowerCase() };
-                }).sort((a, b) => a.label.localeCompare(b.label));
+    if (stepIndex >= steps.length) return;
+    
+    // Slide the old step up and fade it out
+    steps[currentStep].classList.remove('active', 'reverse');
+    steps[currentStep].classList.add('exit-up');
+    
+    currentStep = stepIndex;
+    updateProgress();
+    
+    // Wait for the exit animation to finish (500ms) before showing the next question
+    setTimeout(() => {
+      // Reactivate the new step
+      steps[currentStep].classList.remove('exit-up', 'exit-down', 'reverse');
+      
+      // Force reflow to ensure the entrance animation re-triggers identically
+      void steps[currentStep].offsetWidth;
+      
+      steps[currentStep].classList.add('active');
+      const nextInput = steps[currentStep].querySelector('input[type="text"], input[type="email"], input[type="url"]');
+      if (nextInput) {
+        setTimeout(() => nextInput.focus(), 600); // Wait for transition to finish
+      }
+    }, 500);
+  }
 
-                renderTzDropdown();
-                updateTzSelectedText(currentUserTimezone);
-            } catch(e) { console.error('Timezone init error:', e); }
-        }
+  // Auto-advance for choice cards and scales (Radio buttons)
+  document.querySelectorAll('input[type="radio"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+      setTimeout(() => {
+        goToStep(currentStep + 1);
+      }, 400); // Slight delay to visually confirm choice
+    });
+  });
 
-        function renderTzDropdown(filterText) {
-            filterText = filterText || '';
-            const tzListEl = document.getElementById('tz-list');
-            if(!tzListEl) return;
-            const filtered = filterText ? globalTimezoneList.filter(t => t.searchStr.includes(filterText.toLowerCase())) : globalTimezoneList;
-            
-            tzListEl.innerHTML = filtered.map(tz => 
-                `<div onclick="selectTimezone('` + tz.val + `')" class="px-3 py-2.5 text-[10px] text-white font-light hover:bg-white/10 rounded-lg cursor-pointer transition-colors ${tz.val === currentUserTimezone ? 'bg-white/10 font-bold' : ''}">${tz.label}</div>`
-            ).join('');
-        }
+  // Click listener for OK buttons
+  nextBtns.forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      goToStep(currentStep + 1);
+    });
+  });
 
-        function filterTimezones() {
-            const text = document.getElementById('tz-search').value;
-            renderTzDropdown(text);
-        }
+  // Keyboard listener for "Enter" key
+  document.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault(); // Prevent accidental form submission
+      
+      // If we are on step 9 (index 8), submit the form to proceed to Calendar
+      if (currentStep === 8) {
+        document.getElementById('main-form').requestSubmit();
+      } else if (currentStep < 8) {
+        goToStep(currentStep + 1);
+      }
+    }
+  });
 
-        function toggleTzDropdown() {
-            const menu = document.getElementById('tz-dropdown-menu');
-            const chevron = document.getElementById('tz-chevron');
-            if(!menu) return;
-            const isHidden = menu.classList.contains('hidden');
-            if (isHidden) {
-                menu.classList.remove('hidden');
-                if(chevron) chevron.style.transform = 'rotate(-180deg)';
-                document.getElementById('tz-search').focus();
-            } else {
-                menu.classList.add('hidden');
-                if(chevron) chevron.style.transform = 'rotate(0deg)';
-                document.getElementById('tz-search').value = '';
-                renderTzDropdown(); 
-            }
-        }
+  // Handle final submission and slide to Calendar
+  document.getElementById('main-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    // Slide to Step 10 (Calendar, which is index 9)
+    goToStep(9); 
+    
+    // Initialize the calendar assets as it comes into view
+    if(window.initTimezones) window.initTimezones();
+    if(window.initBookingCalendar) window.initBookingCalendar();
+    if(window.lucide) lucide.createIcons();
+  });
 
-        document.addEventListener('click', function(e) {
-            const menu = document.getElementById('tz-dropdown-menu');
-            const btn = document.getElementById('tz-dropdown-btn');
-            if (menu && !menu.classList.contains('hidden') && !menu.contains(e.target) && btn && !btn.contains(e.target)) {
-                toggleTzDropdown();
-            }
-        });
+  // --- CONFIGURATION & SETUP ---
+  var SUPABASE_URL = 'https://ikeyqwtrqaqogecvxmiq.supabase.co'; 
+  var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlrZXlxd3RycWFxb2dlY3Z4bWlxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0OTE0NTYsImV4cCI6MjA4OTA2NzQ1Nn0.6Gp5Y8J2T8gzY44gmcYojP8z028T6OVKOzfNT_1cqi8'; 
+  var TARGET_PROFILE_ID = 'b64d723a-df63-4447-8ed5-212836ddd659';
+  var WEBHOOK_URL = 'https://n8n.norkx.space/webhook/Leadhascoem';
+  
+  var supabaseInstance = null;
+  try {
+      if (window.supabase) {
+          supabaseInstance = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+              auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
+          });
 
-        function updateTzSelectedText(tzValue) {
-            const found = globalTimezoneList.find(t => t.val === tzValue);
-            const el = document.getElementById('tz-selected-text');
-            if(el && found) el.innerText = found.label;
-        }
+          // Attempt anonymous sign in to fulfill {authenticated} RLS policies for external queries
+          if (supabaseInstance.auth && supabaseInstance.auth.signInAnonymously) {
+              supabaseInstance.auth.signInAnonymously().catch(e => console.warn("Anon auth skip", e));
+          }
 
-        function selectTimezone(newTz) {
-            toggleTzDropdown();
-            currentUserTimezone = newTz;
-            updateTzSelectedText(newTz);
-            if (selectedDateStr) {
-                fetchAndRenderSlots(selectedDateStr); 
-            }
-        }
+          supabaseInstance.channel('public-booking-changes')
+              .on('postgres_changes', { event: '*', schema: 'public', table: 'availability' }, payload => {
+                  if (selectedDateStr) fetchAndRenderSlots(selectedDateStr);
+              })
+              .on('postgres_changes', { event: '*', schema: 'public', table: 'meeting_participants' }, payload => {
+                  if (selectedDateStr) fetchAndRenderSlots(selectedDateStr);
+              })
+              .subscribe();
+      }
+  } catch (e) { console.error("Supabase failed to initialize.", e); }
 
-        // --- 2. CALENDAR LOGIC (NATIVE JS CLONED FROM APP) ---
-        function changeBookingMonth(dir) {
-            const now = new Date();
-            currentBookingMonth += dir;
-            if (currentBookingMonth > 11) { currentBookingMonth = 0; currentBookingYear++; }
-            if (currentBookingMonth < 0) { currentBookingMonth = 11; currentBookingYear--; }
-            
-            const minMonth = now.getMonth();
-            const minYear = now.getFullYear();
-            
-            let maxMonth = minMonth + 1;
-            let maxYear = minYear;
-            if (maxMonth > 11) { maxMonth = 0; maxYear++; }
+  // --- GLOBAL VARIABLES ---
+  var globalTimezoneList = [];
+  var currentUserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+  var currentBookingYear = new Date().getFullYear();
+  var currentBookingMonth = new Date().getMonth();
+  var selectedDateStr = null;
+  var activeSelectedSlot = null;
+  var availableSlotsCache = [];
 
-            const isBeforeMin = currentBookingYear < minYear || (currentBookingYear === minYear && currentBookingMonth < minMonth);
-            const isAfterMax = currentBookingYear > maxYear || (currentBookingYear === maxYear && currentBookingMonth > maxMonth);
+  // --- 1. TIMEZONE LOGIC ---
+  window.initTimezones = function() {
+      try {
+          const timezones = Intl.supportedValuesOf('timeZone');
+          const now = new Date();
+          globalTimezoneList = timezones.map(tz => {
+              const parts = tz.split('/');
+              const city = parts[parts.length - 1].replace(/_/g, ' ');
+              const region = parts.length > 1 ? parts[0].replace(/_/g, ' ') : '';
+              let gmtOffset = '';
+              try {
+                  const tzString = now.toLocaleString('en-US', { timeZone: tz, timeZoneName: 'shortOffset' });
+                  const match = tzString.match(/(GMT[+-]?\d*(?::\d{2})?)/);
+                  if (match) gmtOffset = match[1];
+              } catch(e) {}
+              let label = `${city}`;
+              if (region && region !== city) label += `, ${region}`;
+              if (gmtOffset) label += ` (${gmtOffset})`;
+              return { val: tz, label: label, searchStr: label.toLowerCase() };
+          }).sort((a, b) => a.label.localeCompare(b.label));
 
-            if (isBeforeMin) {
-                currentBookingYear = minYear; currentBookingMonth = minMonth;
-                return;
-            }
-            if (isAfterMax) {
-                currentBookingYear = maxYear; currentBookingMonth = maxMonth;
-                return;
-            }
-            
-            initBookingCalendar();
-            if(window.lucide) lucide.createIcons();
-        }
+          renderTzDropdown();
+          updateTzSelectedText(currentUserTimezone);
+      } catch(e) { console.error('Timezone init error:', e); }
+  }
 
-        function initBookingCalendar() {
-            const grid = document.getElementById('b-calendar-days');
-            const monthLabel = document.getElementById('b-calendar-month-label');
-            if (!grid) return;
-            
-            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-            if(monthLabel) monthLabel.innerText = `${monthNames[currentBookingMonth]} ${currentBookingYear}`;
-            
-            grid.innerHTML = '';
-            
-            const firstDay = new Date(currentBookingYear, currentBookingMonth, 1).getDay();
-            const daysInMonth = new Date(currentBookingYear, currentBookingMonth + 1, 0).getDate();
-            
-            for(let i=0; i<firstDay; i++) {
-                grid.innerHTML += `<div class="booking-day empty"></div>`;
-            }
-            
-            const now = new Date();
-            const bufferTime = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24-hour buffer
-            const bufferMidnight = new Date(bufferTime.getFullYear(), bufferTime.getMonth(), bufferTime.getDate());
+  function renderTzDropdown(filterText) {
+      filterText = filterText || '';
+      const tzListEl = document.getElementById('tz-list');
+      if(!tzListEl) return;
+      const filtered = filterText ? globalTimezoneList.filter(t => t.searchStr.includes(filterText.toLowerCase())) : globalTimezoneList;
+      
+      tzListEl.innerHTML = filtered.map(tz => 
+          `<div onclick="selectTimezone('` + tz.val + `')" class="px-3 py-2.5 text-[10px] text-[var(--accent-color)] font-light hover:bg-[rgba(3,35,48,0.08)] rounded-lg cursor-pointer transition-colors ${tz.val === currentUserTimezone ? 'bg-[rgba(3,35,48,0.08)] font-bold' : ''}">${tz.label}</div>`
+      ).join('');
+  }
 
-            for(let i=1; i<=daysInMonth; i++) {
-                const d = document.createElement('div');
-                const dateObj = new Date(currentBookingYear, currentBookingMonth, i);
-                const dayOfWeek = dateObj.getDay();
+  function filterTimezones() {
+      const text = document.getElementById('tz-search').value;
+      renderTzDropdown(text);
+  }
 
-                // Disable past dates, dates within 24h buffer, and weekends
-                if (dateObj < bufferMidnight || dayOfWeek === 0 || dayOfWeek === 6) {
-                    d.className = "booking-day disabled opacity-20 cursor-not-allowed";
-                    d.innerText = i;
-                } else {
-                    d.className = "booking-day rounded-md hover:bg-white/10";
-                    d.innerText = i;
-                    
-                    const loopDateStr = `${currentBookingYear}-${String(currentBookingMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-                    if (selectedDateStr === loopDateStr) d.classList.add('selected');
+  function toggleTzDropdown() {
+      const menu = document.getElementById('tz-dropdown-menu');
+      const chevron = document.getElementById('tz-chevron');
+      if(!menu) return;
+      const isHidden = menu.classList.contains('hidden');
+      if (isHidden) {
+          menu.classList.remove('hidden');
+          if(chevron) chevron.style.transform = 'rotate(-180deg)';
+          document.getElementById('tz-search').focus();
+      } else {
+          menu.classList.add('hidden');
+          if(chevron) chevron.style.transform = 'rotate(0deg)';
+          document.getElementById('tz-search').value = '';
+          renderTzDropdown(); 
+      }
+  }
 
-                    d.onclick = (e) => {
-                        document.querySelectorAll('.booking-day').forEach(el => el.classList.remove('selected'));
-                        e.currentTarget.classList.add('selected');
-                        
-                        selectedDateStr = loopDateStr;
-                        
-                        const options = { month: 'long', day: 'numeric', year: 'numeric' };
-                        document.getElementById('selectedDateLabel').innerText = dateObj.toLocaleDateString('en-US', options);
-                        
-                        document.getElementById('timeSlotsContainer').classList.add('open');
-                        document.getElementById('bookNowBtnContainer').classList.add('hidden');
-                        activeSelectedSlot = null;
-                        
-                        fetchAndRenderSlots(selectedDateStr);
-                    };
-                }
-                grid.appendChild(d);
-            }
-        }
+  document.addEventListener('click', function(e) {
+      const menu = document.getElementById('tz-dropdown-menu');
+      const btn = document.getElementById('tz-dropdown-btn');
+      if (menu && !menu.classList.contains('hidden') && !menu.contains(e.target) && btn && !btn.contains(e.target)) {
+          toggleTzDropdown();
+      }
+  });
 
-        // --- 3. FETCH AND RENDER SLOTS ---
-        async function fetchAndRenderSlots(dateStr) {
-            const list = document.getElementById('timeSlotsList');
-            list.innerHTML = '<p class="text-[10px] text-white/40 uppercase col-span-full text-center py-4">Checking availability...</p>';
-            
-            try {
-                if (!supabaseInstance) throw new Error("Supabase is not connected. Make sure you entered valid URLs.");
+  function updateTzSelectedText(tzValue) {
+      const found = globalTimezoneList.find(t => t.val === tzValue);
+      const el = document.getElementById('tz-selected-text');
+      if(el && found) el.innerText = found.label;
+  }
 
-                const [year, month, day] = dateStr.split('-').map(Number);
-                const dateObj = new Date(year, month - 1, day);
-                const dayOfWeekNum = dateObj.getDay(); 
-                
-                const { data: availability, error: availErr } = await supabaseInstance
-                    .from('availability')
-                    .select('start_time_local, end_time_local')
-                    .eq('user_id', TARGET_PROFILE_ID)
-                    .eq('day_of_week', dayOfWeekNum);
+  function selectTimezone(newTz) {
+      toggleTzDropdown();
+      currentUserTimezone = newTz;
+      updateTzSelectedText(newTz);
+      if (selectedDateStr) {
+          fetchAndRenderSlots(selectedDateStr); 
+      }
+  }
 
-                if (availErr) throw availErr;
+  // --- 2. CALENDAR LOGIC ---
+  function changeBookingMonth(dir) {
+      const now = new Date();
+      currentBookingMonth += dir;
+      if (currentBookingMonth > 11) { currentBookingMonth = 0; currentBookingYear++; }
+      if (currentBookingMonth < 0) { currentBookingMonth = 11; currentBookingYear--; }
+      
+      const minMonth = now.getMonth();
+      const minYear = now.getFullYear();
+      let maxMonth = minMonth + 1;
+      let maxYear = minYear;
+      if (maxMonth > 11) { maxMonth = 0; maxYear++; }
 
-                const baseDateUTC = new Date(Date.UTC(year, month - 1, day, 0, 0, 0));
-                const minUTC = new Date(baseDateUTC.getTime() - 24 * 60 * 60 * 1000).toISOString();
-                const maxUTC = new Date(baseDateUTC.getTime() + 48 * 60 * 60 * 1000).toISOString();
+      const isBeforeMin = currentBookingYear < minYear || (currentBookingYear === minYear && currentBookingMonth < minMonth);
+      const isAfterMax = currentBookingYear > maxYear || (currentBookingYear === maxYear && currentBookingMonth > maxMonth);
 
-                const { data: bookedMeetings, error: meetErr } = await supabaseInstance
-                    .from('meeting_participants')
-                    .select(`meetings!inner ( start_time_utc, end_time_utc )`)
-                    .eq('user_id', TARGET_PROFILE_ID)
-                    .gte('meetings.start_time_utc', minUTC)
-                    .lt('meetings.start_time_utc', maxUTC);
+      if (isBeforeMin) {
+          currentBookingYear = minYear; currentBookingMonth = minMonth;
+          return;
+      }
+      if (isAfterMax) {
+          currentBookingYear = maxYear; currentBookingMonth = maxMonth;
+          return;
+      }
+      window.initBookingCalendar();
+      if(window.lucide) lucide.createIcons();
+  }
 
-                if (meetErr) throw meetErr;
+  window.initBookingCalendar = function() {
+      const grid = document.getElementById('b-calendar-days');
+      const monthLabel = document.getElementById('b-calendar-month-label');
+      if (!grid) return;
+      
+      const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      if(monthLabel) monthLabel.innerText = `${monthNames[currentBookingMonth]} ${currentBookingYear}`;
+      
+      grid.innerHTML = '';
+      const firstDay = new Date(currentBookingYear, currentBookingMonth, 1).getDay();
+      const daysInMonth = new Date(currentBookingYear, currentBookingMonth + 1, 0).getDate();
+      
+      for(let i=0; i<firstDay; i++) {
+          grid.innerHTML += `<div class="booking-day empty"></div>`;
+      }
+      
+      const now = new Date();
+      const bufferTime = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+      const bufferMidnight = new Date(bufferTime.getFullYear(), bufferTime.getMonth(), bufferTime.getDate());
 
-                const allMeetings = bookedMeetings ? bookedMeetings.map(m => m.meetings) : [];
-                
-                // STRICT RULE: If the DB returns no availability for this day, do not use static fallbacks.
-                if (!availability || availability.length === 0) {
-                    availableSlotsCache = [];
-                    renderTimeSlots();
-                    return;
-                }
-                
-                let baseRule = availability[0];
-                const [sh, sm] = baseRule.start_time_local.split(':').map(Number);
-                const [eh, em] = baseRule.end_time_local.split(':').map(Number);
-                const startMins = sh * 60 + sm;
-                const endMins = eh * 60 + em;
+      for(let i=1; i<=daysInMonth; i++) {
+          const d = document.createElement('div');
+          const dateObj = new Date(currentBookingYear, currentBookingMonth, i);
+          const dayOfWeek = dateObj.getDay();
 
-                const now = new Date();
-                const bufferTime = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24-hour buffer
-                const ms = 1000 * 60 * 30; 
-                const roundedBufferTime = new Date(Math.ceil(bufferTime.getTime() / ms) * ms);
+          if (dateObj < bufferMidnight || dayOfWeek === 0 || dayOfWeek === 6) {
+              d.className = "booking-day disabled opacity-20 cursor-not-allowed text-[var(--accent-color)]";
+              d.innerText = i;
+          } else {
+              d.className = "booking-day rounded-md hover:bg-[rgba(3,35,48,0.08)] text-[var(--accent-color)]";
+              d.innerText = i;
+              
+              const loopDateStr = `${currentBookingYear}-${String(currentBookingMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+              if (selectedDateStr === loopDateStr) d.classList.add('selected');
 
-                availableSlotsCache = [];
+              d.onclick = (e) => {
+                  document.querySelectorAll('.booking-day').forEach(el => el.classList.remove('selected'));
+                  e.currentTarget.classList.add('selected');
+                  
+                  selectedDateStr = loopDateStr;
+                  const options = { month: 'long', day: 'numeric', year: 'numeric' };
+                  document.getElementById('selectedDateLabel').innerText = dateObj.toLocaleDateString('en-US', options);
+                  
+                  document.getElementById('timeSlotsContainer').classList.add('open');
+                  document.getElementById('bookNowBtnContainer').classList.add('hidden');
+                  activeSelectedSlot = null;
+                  
+                  fetchAndRenderSlots(selectedDateStr);
+              };
+          }
+          grid.appendChild(d);
+      }
+  }
 
-                for (let i = 0; i < 144; i++) {
-                    const slotStartUTC = new Date(new Date(minUTC).getTime() + i * 30 * 60000);
-                    const slotEndUTC = new Date(slotStartUTC.getTime() + 30 * 60000);
+  // --- 3. FETCH AND RENDER SLOTS ---
+  async function fetchAndRenderSlots(dateStr) {
+      const list = document.getElementById('timeSlotsList');
+      list.innerHTML = '<p class="text-[10px] text-[rgba(3,35,48,0.5)] uppercase col-span-full text-center py-4">Checking availability...</p>';
+      
+      try {
+          if (!supabaseInstance) throw new Error("Supabase is not connected. Make sure you entered valid URLs.");
+          const [year, month, day] = dateStr.split('-').map(Number);
+          const dateObj = new Date(year, month - 1, day);
+          const dayOfWeekNum = dateObj.getDay(); 
+          
+          const baseDateUTC = new Date(Date.UTC(year, month - 1, day, 0, 0, 0));
+          const minUTC = new Date(baseDateUTC.getTime() - 24 * 60 * 60 * 1000).toISOString();
+          const maxUTC = new Date(baseDateUTC.getTime() + 48 * 60 * 60 * 1000).toISOString();
 
-                    if (slotStartUTC < roundedBufferTime) continue; 
+          // Securely call the RPC function to bypass RLS and fetch only necessary scheduling data
+          const { data: rpcData, error: rpcErr } = await supabaseInstance.rpc('get_public_booking_data', {
+              p_target_profile_id: TARGET_PROFILE_ID,
+              p_start_utc: minUTC,
+              p_end_utc: maxUTC
+          });
 
-                    const viewerDateCheck = new Intl.DateTimeFormat('en-CA', {
-                        timeZone: currentUserTimezone, year: 'numeric', month: '2-digit', day: '2-digit'
-                    }).format(slotStartUTC);
+          if (rpcErr) throw rpcErr;
 
-                    if (viewerDateCheck !== dateStr) continue;
+          const hostTz = rpcData.timezone;
+          const allMeetings = rpcData.busy_slots || [];
+          const dayAvailability = (rpcData.availability || []).filter(a => a.day_of_week === dayOfWeekNum);
+          
+          if (!dayAvailability || dayAvailability.length === 0) {
+              availableSlotsCache = [];
+              renderTimeSlots();
+              return;
+          }
 
-                    const hasCollision = allMeetings.some(m => {
-                        const mStart = new Date(m.start_time_utc);
-                        const mEnd = new Date(m.end_time_utc);
-                        return (slotStartUTC < mEnd && slotEndUTC > mStart);
-                    });
+          let baseRule = dayAvailability[0];
+          const [sh, sm] = baseRule.start_time_local.split(':').map(Number);
+          const [eh, em] = baseRule.end_time_local.split(':').map(Number);
+          const startMins = sh * 60 + sm;
+          const endMins = eh * 60 + em;
+          const now = new Date();
+          const bufferTime = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+          const ms = 1000 * 60 * 30; 
+          const roundedBufferTime = new Date(Math.ceil(bufferTime.getTime() / ms) * ms);
 
-                    if (hasCollision) continue;
+          availableSlotsCache = [];
+          for (let i = 0; i < 144; i++) {
+              const slotStartUTC = new Date(new Date(minUTC).getTime() + i * 30 * 60000);
+              const slotEndUTC = new Date(slotStartUTC.getTime() + 30 * 60000);
 
-                    const hostFormat = new Intl.DateTimeFormat('en-US', {
-                        timeZone: 'UTC', 
-                        hour: '2-digit', minute: '2-digit', hour12: false
-                    }).formatToParts(new Date(slotStartUTC.getTime() + 15 * 60000));
-                    
-                    let hostHour = hostFormat.find(pt => pt.type === 'hour').value;
-                    const hostMin = hostFormat.find(pt => pt.type === 'minute').value;
-                    if (hostHour === '24') hostHour = '00';
+              if (slotStartUTC < roundedBufferTime) continue; 
+              const viewerDateCheck = new Intl.DateTimeFormat('en-CA', {
+                  timeZone: currentUserTimezone, year: 'numeric', month: '2-digit', day: '2-digit'
+              }).format(slotStartUTC);
 
-                    const slotMins = parseInt(hostHour) * 60 + parseInt(hostMin);
-                    let isAvailable = false;
+              if (viewerDateCheck !== dateStr) continue;
+              const hasCollision = allMeetings.some(m => {
+                  const mStart = new Date(m.start_time_utc);
+                  const mEnd = new Date(m.end_time_utc);
+                  return (slotStartUTC < mEnd && slotEndUTC > mStart);
+              });
 
-                    if (startMins <= endMins) {
-                        if (slotMins >= startMins && slotMins < endMins) isAvailable = true;
-                    } else { 
-                        if (slotMins >= startMins || slotMins < endMins) isAvailable = true;
-                    }
+              if (hasCollision) continue;
+              
+              // FIX: Use the host's timezone to correctly interpret their local availability rules
+              const hostFormat = new Intl.DateTimeFormat('en-US', {
+                  timeZone: hostTz, hour: '2-digit', minute: '2-digit', hour12: false
+              }).formatToParts(new Date(slotStartUTC.getTime() + 15 * 60000));
+              
+              let hostHour = hostFormat.find(pt => pt.type === 'hour').value;
+              const hostMin = hostFormat.find(pt => pt.type === 'minute').value;
+              if (hostHour === '24') hostHour = '00';
+              const slotMins = parseInt(hostHour) * 60 + parseInt(hostMin);
+              let isAvailable = false;
+              if (startMins <= endMins) {
+                  if (slotMins >= startMins && slotMins < endMins) isAvailable = true;
+              } else { 
+                  if (slotMins >= startMins || slotMins < endMins) isAvailable = true;
+              }
 
-                    if (isAvailable) {
-                        const labelFormatter = new Intl.DateTimeFormat('en-US', { timeZone: currentUserTimezone, hour: 'numeric', minute: '2-digit' });
-                        availableSlotsCache.push({
-                            label: `${labelFormatter.format(slotStartUTC)} - ${labelFormatter.format(slotEndUTC)}`,
-                            startUTC: slotStartUTC.toISOString(),
-                            endUTC: slotEndUTC.toISOString()
-                        });
-                    }
-                }
+              if (isAvailable) {
+                  const labelFormatter = new Intl.DateTimeFormat('en-US', { timeZone: currentUserTimezone, hour: 'numeric', minute: '2-digit' });
+                  availableSlotsCache.push({
+                      label: `${labelFormatter.format(slotStartUTC)} - ${labelFormatter.format(slotEndUTC)}`,
+                      startUTC: slotStartUTC.toISOString(),
+                      endUTC: slotEndUTC.toISOString()
+                  });
+              }
+          }
+          renderTimeSlots();
+      } catch (error) {
+          console.error("Error fetching slots:", error);
+          list.innerHTML = `<p class="text-[10px] text-red-500 uppercase col-span-full text-center py-4">Failed to load schedule.</p>`;
+      }
+  }
 
-                renderTimeSlots();
+  function renderTimeSlots() {
+      const list = document.getElementById('timeSlotsList');
+      list.innerHTML = '';
+      
+      if (availableSlotsCache.length === 0) {
+          list.innerHTML = '<p class="text-[10px] text-[rgba(3,35,48,0.5)] uppercase col-span-full text-center py-4 tracking-widest">No mutual slots found</p>';
+          return;
+      }
 
-            } catch (error) {
-                console.error("Error fetching slots:", error);
-                list.innerHTML = `<p class="text-[10px] text-red-400 uppercase col-span-full text-center py-4">Failed to load schedule.</p>`;
-            }
-        }
+      availableSlotsCache.forEach(slot => {
+          let tzAbbr = '';
+          try {
+              const tzString = new Date(slot.startUTC).toLocaleString('en-US', { timeZone: currentUserTimezone, timeZoneName: 'short' });
+              tzAbbr = tzString.split(' ').pop();
+          } catch(e) {}
 
-        function renderTimeSlots() {
-            const list = document.getElementById('timeSlotsList');
-            list.innerHTML = '';
-            
-            if (availableSlotsCache.length === 0) {
-                list.innerHTML = '<p class="text-[10px] text-white/40 uppercase col-span-full text-center py-4 tracking-widest">No mutual slots found</p>';
-                return;
-            }
+          const slotBtn = document.createElement('button');
+          slotBtn.type = "button";
+          slotBtn.className = "time-slot-btn w-full text-left p-2 mb-2 bg-[rgba(3,35,48,0.03)] hover:bg-[rgba(3,35,48,0.08)] border border-[rgba(3,35,48,0.1)] rounded-xl transition-all flex justify-between items-center group text-[var(--accent-color)]";
+          slotBtn.innerHTML = `
+              <span class="text-sm font-bold tracking-tight">${slot.label} ${tzAbbr}</span>
+              <i data-lucide="check-circle-2" class="w-5 h-5 opacity-0 transition-all check-icon"></i>
+          `;
+          
+          slotBtn.onclick = (e) => {
+              document.querySelectorAll('.time-slot-btn').forEach(b => {
+                  b.classList.remove('bg-[var(--accent-color)]', 'text-white', 'shadow-md');
+                  b.classList.add('bg-[rgba(3,35,48,0.03)]', 'text-[var(--accent-color)]', 'hover:bg-[rgba(3,35,48,0.08)]');
+                  b.querySelector('.check-icon').classList.replace('opacity-100', 'opacity-0');
+              });
+              
+              slotBtn.classList.remove('bg-[rgba(3,35,48,0.03)]', 'text-[var(--accent-color)]', 'hover:bg-[rgba(3,35,48,0.08)]');
+              slotBtn.classList.add('bg-[var(--accent-color)]', 'text-white', 'shadow-md');
+              slotBtn.querySelector('.check-icon').classList.replace('opacity-0', 'opacity-100');
+              
+              activeSelectedSlot = {
+                  timeUtc: slot.startUTC,
+                  endUtc: slot.endUTC,
+                  timeLocal: slot.label,
+                  timezone: currentUserTimezone
+              };
+              document.getElementById('bookNowBtnContainer').classList.remove('hidden');
+          };
+          list.appendChild(slotBtn);
+      });
+      if(window.lucide) lucide.createIcons();
+  }
 
-            availableSlotsCache.forEach(slot => {
-                let tzAbbr = '';
-                try {
-                    const tzString = new Date(slot.startUTC).toLocaleString('en-US', { timeZone: currentUserTimezone, timeZoneName: 'short' });
-                    tzAbbr = tzString.split(' ').pop();
-                } catch(e) {}
+  // --- 4. BOOKING, DB WRITE & WEBHOOK ---
+  async function confirmBooking() {
+      if (!activeSelectedSlot) return;
 
-                const slotBtn = document.createElement('button');
-                slotBtn.className = "time-slot-btn w-full text-left p-4 mb-2 bg-white/[0.03] hover:bg-white/10 border border-white/10 rounded-xl transition-all flex justify-between items-center group";
-                slotBtn.innerHTML = `
-                    <span class="text-sm font-bold tracking-tight">${slot.label} ${tzAbbr}</span>
-                    <i data-lucide="check-circle-2" class="w-5 h-5 text-white/0 transition-all check-icon"></i>
-                `;
-                
-                slotBtn.onclick = (e) => {
-                    document.querySelectorAll('.time-slot-btn').forEach(b => {
-                        b.classList.remove('bg-white', 'text-black', 'hover:bg-white/80');
-                        b.classList.add('bg-white/[0.03]', 'text-white', 'hover:bg-white/10');
-                        b.querySelector('.check-icon').classList.replace('text-black', 'text-white/0');
-                    });
-                    
-                    slotBtn.classList.remove('bg-white/[0.03]', 'text-white', 'hover:bg-white/10');
-                    slotBtn.classList.add('bg-white', 'text-black', 'hover:bg-white/80');
-                    slotBtn.querySelector('.check-icon').classList.replace('text-white/0', 'text-black');
-                    
-                    activeSelectedSlot = {
-                        timeUtc: slot.startUTC,
-                        endUtc: slot.endUTC,
-                        timeLocal: slot.label,
-                        timezone: currentUserTimezone
-                    };
-                    document.getElementById('bookNowBtnContainer').classList.remove('hidden');
-                };
-                list.appendChild(slotBtn);
-            });
-            if(window.lucide) lucide.createIcons();
-        }
+      const btn = document.querySelector('#bookNowBtnContainer button');
+      const originalContent = btn.innerHTML;
+      btn.innerHTML = `<svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
+      btn.classList.add('opacity-75', 'pointer-events-none');
 
-        // --- 4. BOOKING, DB WRITE & WEBHOOK ---
-        function getFormAnswers() {
-            const answers = {};
-            const getSingle = (step) => document.querySelector(`[data-step="${step}"] .choice-card.selected`)?.innerText.replace('Other\\n', '').trim() || '';
-            const getMulti = (step) => Array.from(document.querySelectorAll(`[data-step="${step}"] .choice-card.selected`)).map(el => el.innerText).join(', ') || '';
+      try {
+          if (!supabaseInstance) throw new Error("Supabase is not configured. Check the URL/Key.");
 
-            answers.identity = getSingle(1);
-            answers.platforms = getMulti(2);
-            answers.contentType = getMulti(3);
-            answers.volume = getSingle(4);
-            answers.painPoints = getSingle(5);
-            answers.style = getSingle(6);
-            answers.budget = getSingle(7);
-            answers.name = document.getElementById('nameInput').value.trim();
-            answers.email = document.getElementById('emailInput').value.trim();
-            
-            return answers;
-        }
+          // 1. Double check for overlaps securely using the new RPC
+          const { data: rpcData, error: rpcErr } = await supabaseInstance.rpc('get_public_booking_data', {
+              p_target_profile_id: TARGET_PROFILE_ID,
+              p_start_utc: activeSelectedSlot.timeUtc,
+              p_end_utc: activeSelectedSlot.endUtc
+          });
 
-        async function confirmBooking() {
-            if (!activeSelectedSlot) return;
+          if (rpcErr) throw rpcErr;
 
-            const btn = document.querySelector('#bookNowBtnContainer button');
-            const originalText = btn.innerText;
-            btn.innerText = 'Securing...';
-            btn.classList.add('opacity-50', 'pointer-events-none');
+          // Check if any returned busy slot overlaps with our selected slot
+          const conflictCheck = (rpcData.busy_slots || []).filter(m => {
+              const mStart = new Date(m.start_time_utc);
+              const mEnd = new Date(m.end_time_utc);
+              const sStart = new Date(activeSelectedSlot.timeUtc);
+              const sEnd = new Date(activeSelectedSlot.endUtc);
+              return (sStart < mEnd && sEnd > mStart);
+          });
 
-            try {
-                if (!supabaseInstance) throw new Error("Supabase is not configured. Check the URL/Key.");
+          if (conflictCheck.length > 0) {
+              alert("Sorry! This time slot is no longer available. Please select another time.");
+              fetchAndRenderSlots(selectedDateStr); 
+              btn.innerHTML = originalContent;
+              btn.classList.remove('opacity-75', 'pointer-events-none');
+              return;
+          }
 
-                // Last-minute surety check: verify overlaps haven't changed in the last few seconds
-                const { data: conflictCheck, error: checkErr } = await supabaseInstance
-                    .from('meeting_participants')
-                    .select(`meetings!inner(start_time_utc, end_time_utc)`)
-                    .eq('user_id', TARGET_PROFILE_ID)
-                    .lt('meetings.start_time_utc', activeSelectedSlot.endUtc)
-                    .gt('meetings.end_time_utc', activeSelectedSlot.timeUtc);
+          // 2. RLS strictly prevents external leads from inserting into `meetings` (auth.uid() = host_id).
+          // We MUST delegate the actual database insertion to the n8n webhook.
+          const emailInput = document.querySelector('input[name="email"]') ? document.querySelector('input[name="email"]').value : 'Unknown User';
+          
+          const [y, m, d] = selectedDateStr.split('-').map(Number);
+          const suffix = (d > 3 && d < 21) || d % 10 > 3 ? 'th' : ['th', 'st', 'nd', 'rd'][d % 10];
+          const monthNames = ["Jan", "Feb", "March", "April", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"];
+          const formattedDate = `${d}${suffix} ${monthNames[m - 1]}, ${y}`;
 
-                if (conflictCheck && conflictCheck.length > 0) {
-                    alert("Sorry! This time slot is no longer available. Please select another time.");
-                    fetchAndRenderSlots(selectedDateStr); 
-                    btn.innerText = originalText;
-                    btn.classList.remove('opacity-50', 'pointer-events-none');
-                    return;
-                }
+          // Create a temporary ID to fulfill the webhook requirement
+          const temporaryMeetingId = crypto.randomUUID ? crypto.randomUUID() : 'pending-backend-id';
 
-                const titleStr = "Strategy Session with " + document.getElementById('nameInput').value.trim();
-                const { data: newMeeting, error: meetingErr } = await supabaseInstance
-                    .from('meetings')
-                    .insert([{ 
-                        host_id: TARGET_PROFILE_ID,
-                        title: titleStr,
-                        start_time_utc: activeSelectedSlot.timeUtc, 
-                        end_time_utc: activeSelectedSlot.endUtc,
-                        status: 'scheduled',
-                        type: 'lead'
-                    }])
-                    .select()
-                    .single();
+          const payload = {
+              target_profile_id: TARGET_PROFILE_ID,
+              meeting_id: temporaryMeetingId,
+              guest_email: emailInput,
+              booking_details: {
+                  date_selected: formattedDate,
+                  starttime: activeSelectedSlot.timeUtc,
+                  endtime: activeSelectedSlot.endUtc,
+                  user_timezone: activeSelectedSlot.timezone,
+                  time_local: activeSelectedSlot.timeLocal
+              }
+          };
 
-                if (meetingErr) throw meetingErr;
+          const webhookResponse = await fetch(WEBHOOK_URL, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+          });
 
-                const { error: partErr } = await supabaseInstance
-                    .from('meeting_participants')
-                    .insert([{
-                        meeting_id: newMeeting.id,
-                        user_id: TARGET_PROFILE_ID,
-                        response_status: 'accepted'
-                    }]);
+          // Slide to Step 11 (Success Message, index 10)
+          goToStep(10); 
+          
+          // Optionally fade out progress bar once finished
+          const pBar = document.querySelector('.progress-bar-fill');
+          if(pBar) pBar.style.opacity = '0';
 
-                if (partErr) throw partErr;
+          // Hide the navigation pill so the user cannot review/go back after booking
+          const navPill = document.querySelector('.nav-pill');
+          if(navPill) navPill.style.display = 'none';
 
-                // Format the date to "18th March, 2026" style
-                const [y, m, d] = selectedDateStr.split('-').map(Number);
-                const suffix = (d > 3 && d < 21) || d % 10 > 3 ? 'th' : ['th', 'st', 'nd', 'rd'][d % 10];
-                const monthNames = ["Jan", "Feb", "March", "April", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"];
-                const formattedDate = `${d}${suffix} ${monthNames[m - 1]}, ${y}`;
+      } catch (error) {
+          console.error("Booking Error:", error);
+          alert("There was an issue scheduling your session. " + (error.message || "Please try again."));
+          btn.innerHTML = originalContent;
+          btn.classList.remove('opacity-75', 'pointer-events-none');
+      }
+  }
+</script>
 
-                const payload = {
-                    target_profile_id: TARGET_PROFILE_ID,
-                    meeting_id: newMeeting.id,
-                    lead_details: getFormAnswers(),
-                    booking_details: {
-                        date_selected: formattedDate,
-                        starttime: activeSelectedSlot.timeUtc,
-                        endtime: activeSelectedSlot.endUtc,
-                        user_timezone: activeSelectedSlot.timezone,
-                        time_local: activeSelectedSlot.timeLocal
-                    }
-                };
-
-                await fetch(WEBHOOK_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                document.getElementById('bookingInterface').classList.add('hidden');
-                document.getElementById('successMessage').classList.remove('hidden');
-                document.getElementById('successMessage').classList.add('flex');
-                document.getElementById('progressBar').classList.add('opacity-0');
-
-            } catch (error) {
-                console.error("Booking Error:", error);
-                alert("There was an issue scheduling your session. " + (error.message || "Please try again."));
-                btn.innerText = originalText;
-                btn.classList.remove('opacity-50', 'pointer-events-none');
-            }
-        }
-
-        // --- MAP FUNCTIONS TO THE UI'S ANIMATION PIPELINE ---
-        window.initTimezones = initTimezones;
-        window.generateCalendar = initBookingCalendar;
-
-    </script>
 </body>
 </html>
