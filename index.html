@@ -9,6 +9,36 @@
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
+  /* ------------------------------------------- */
+  /* DYNAMIC ENVIRONMENT OVERRIDES               */
+  /* ------------------------------------------- */
+
+  /* 1. If we detect an IN-APP BROWSER */
+  body.is-in-app-browser {
+      /* Force strict height calculation to fight WebView bugs */
+      height: 100vh !important; 
+      position: fixed !important; 
+      overflow: hidden !important;
+  }
+
+  body.is-in-app-browser .step {
+      /* In-app browsers often ignore 'env()', so we force hard pixel fallbacks */
+      padding-top: 80px !important; 
+      padding-bottom: 120px !important;
+  }
+
+  /* 2. If we detect specifically LINKEDIN */
+  body.is-linkedin .nav-pill {
+      /* LinkedIn's bottom bar is unusually tall, push our nav up higher */
+      bottom: 60px !important; 
+  }
+
+  /* 3. If we detect standard MOBILE (but NOT an in-app browser) */
+  body.is-mobile:not(.is-in-app-browser) .step {
+      /* We can safely use advanced dynamic viewports here */
+      height: 100dvh !important; 
+  }
+  
   :root {
     --bg-color: #ffffff;
     --text-color: #000000;
@@ -1033,6 +1063,40 @@
 </form>
 
 <script>
+  // --- ENVIRONMENT DETECTION ---
+  function detectEnvironment() {
+      const ua = navigator.userAgent || navigator.vendor || window.opera;
+      const body = document.body;
+
+      // 1. Detect if it's a mobile device generally
+      const isMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(ua.toLowerCase());
+      if (isMobile) {
+          body.classList.add('is-mobile');
+      } else {
+          body.classList.add('is-desktop');
+      }
+
+      // 2. Detect notorious In-App Browsers via UA strings
+      const rules = [
+          'FBAV', 'FBAN', // Facebook
+          'Instagram',    // Instagram
+          'LinkedInApp',  // LinkedIn
+          'Twitter',      // X / Twitter
+          'Bytedance',    // TikTok
+          'Snapchat'      // Snapchat
+      ];
+      
+      const isInApp = rules.some(rule => ua.indexOf(rule) > -1);
+      
+      if (isInApp) {
+          body.classList.add('is-in-app-browser');
+          // Optional: You can even detect which specific one if needed
+          if (ua.indexOf('LinkedInApp') > -1) body.classList.add('is-linkedin');
+      }
+  }
+
+  // Run detection immediately
+  detectEnvironment();
   // Dropdown Logic for Step 8
   document.addEventListener('DOMContentLoaded', () => {
     const ddInput = document.getElementById('q8-input');
