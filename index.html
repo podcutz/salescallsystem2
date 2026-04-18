@@ -35,19 +35,39 @@
     position: relative;
   }
 
-  /* Each question takes up exactly one full screen (100vh) */
+  /* Each question takes up exactly one full screen */
   .step {
     height: 100vh;
+    height: 100dvh; /* Dynamic viewport height for mobile/in-app browsers */
     width: 100%;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
     opacity: 0;
     position: absolute;
     top: 0;
     left: 0;
     visibility: hidden;
+    overflow-y: auto; /* Enables scrolling for tall questions */
+    padding-top: 50px; /* Mandatory restricted top area so questions never hit the progress line */
+    padding-bottom: 20px;
+    box-sizing: border-box;
     /* Transition removed to prevent snapping; animations handle movement strictly */
+  }
+
+  /* Dark bluish scrollbar for tall questions */
+  .step::-webkit-scrollbar {
+    width: 6px;
+  }
+  .step::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .step::-webkit-scrollbar-thumb {
+    background: rgba(3, 35, 48, 0.4); /* Matches your accent color palette */
+    border-radius: 10px;
+  }
+  .step::-webkit-scrollbar-thumb:hover {
+    background: rgba(3, 35, 48, 0.7);
   }
 
   /* Class to slide the old question up and out */
@@ -169,6 +189,8 @@
     width: 100%;
     max-width: 900px;
     padding: 40px;
+    margin: auto 0; /* Auto margin centers vertically, preventing top cutoff on overflow */
+    flex-shrink: 0; /* Prevents content squishing on small screens */
     box-sizing: border-box;
   }
 
@@ -593,15 +615,17 @@
       /* Center questions on the vertical axis */
       .step {
           align-items: center;
-          justify-content: center;
+          justify-content: flex-start; /* Allows natural flow if content overflows */
           overflow-y: auto;
           height: 100dvh; /* Mobile browser height fix */
+          padding-top: 60px; /* Mandatory restricted top area for mobile */
       }
       
       .step-content {
           padding: 24px 20px;
-          margin-top: 0;
-          padding-bottom: 80px; /* Prevents nav pill from hiding content */
+          margin: auto 0; /* Ensures it stays vertically centered but scrolls safely */
+          padding-bottom: 100px; /* Prevents nav pill from hiding content */
+          flex-shrink: 0;
       }
 
       /* Stack question number and text */
