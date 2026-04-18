@@ -38,7 +38,7 @@
       /* We can safely use advanced dynamic viewports here */
       height: 100dvh !important; 
   }
-  
+
   :root {
     --bg-color: #ffffff;
     --text-color: #000000;
@@ -80,6 +80,7 @@
     align-items: center;
     opacity: 0;
     visibility: hidden;
+    overflow-x: hidden; /* Hard lock to prevent anything spilling right of the screen */
     overflow-y: auto; /* Enables scrolling for tall questions */
     -webkit-overflow-scrolling: touch; /* CRUCIAL: smooth native scrolling in iOS WebViews */
     padding-top: calc(50px + env(safe-area-inset-top)); /* Respects notches on mobile devices */
@@ -254,13 +255,16 @@
     padding: 0 2px;
   }
 
-  /* Fix for Browser Autofill blue background issue */
+  /* Fix for Browser Autofill blue background issue (Enhanced for In-App WebViews like Slack) */
   .tf-input:-webkit-autofill,
   .tf-input:-webkit-autofill:hover, 
   .tf-input:-webkit-autofill:focus, 
-  .tf-input:-webkit-autofill:active {
-    -webkit-box-shadow: 0 0 0 30px var(--bg-color) inset !important;
+  .tf-input:-webkit-autofill:active,
+  .custom-dropdown-input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 1000px var(--bg-color) inset !important;
     -webkit-text-fill-color: var(--accent-color) !important;
+    background-clip: content-box !important;
+    border-radius: 0;
     transition: background-color 5000s ease-in-out 0s;
   }
 
@@ -285,8 +289,11 @@
     margin-bottom: 8px;
   }
 
+  
   .tf-input {
     width: 100%;
+    max-width: 100%;
+    box-sizing: border-box; /* Forces padding to stay within screen limits */
     background: transparent;
     border: none;
     border-bottom: 1px solid var(--input-border);
@@ -696,7 +703,7 @@
           display: none; /* Hides 'press Enter' text on mobile completely */
       }
 
-      /* Snap all elements to the left edge of the centered imaginary container */
+      /* Snap all elements to the left edge of the centered imaginary container safely */
       .description, 
       .input-wrapper, 
       .button-wrapper, 
@@ -705,6 +712,9 @@
       .custom-dropdown-container {
           margin-left: 0;
           width: 100%;
+          max-width: 100%; /* Safety guard against screen overflow */
+          box-sizing: border-box; /* Forces padding/borders inward */
+          word-wrap: break-word; /* Breaks long text so it doesn't push off screen */
       }
 
       /* Perfect 6-5 staggered pyramid layout for Q5 scale on mobile */
@@ -744,14 +754,16 @@
       }
       
       #timeSlotsContainer.open {
+          width: 100%; /* Explicit full width to widen viewport */
           max-width: 100%;
-          height: 310px; /* Absolute fixed height completely eliminates sliding jitter */
+          height: 400px; /* Increased to perfectly match desktop viewport height */
           margin-left: 0;
           margin-top: 1.5rem;
       }
       
       #timeSlotsList {
-          height: 250px !important; /* Fixed height protects list */
+          height: 340px !important; /* Increased vertically to allow more slots to show */
+          overflow-y: auto; /* Enforces clean scroll bar inside the extended list */
       }
 
       .time-slot-btn {
