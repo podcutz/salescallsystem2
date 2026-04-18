@@ -26,6 +26,8 @@
     color: var(--text-color);
     font-family: var(--font-family);
     overflow: hidden; /* Hide scrollbars for the full-screen effect */
+    position: fixed; /* Locks the viewport completely in WebViews to prevent bounce/pull-to-refresh */
+    overscroll-behavior-y: none;
   }
 
   /* The main container */
@@ -35,22 +37,23 @@
     position: relative;
   }
 
-  /* Each question takes up exactly one full screen */
+  /* Each question takes up exactly one full screen securely via absolute coordinates */
   .step {
-    height: 100vh;
-    height: 100dvh; /* Dynamic viewport height for mobile/in-app browsers */
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
     opacity: 0;
-    position: absolute;
-    top: 0;
-    left: 0;
     visibility: hidden;
     overflow-y: auto; /* Enables scrolling for tall questions */
-    padding-top: 50px; /* Mandatory restricted top area so questions never hit the progress line */
-    padding-bottom: 20px;
+    -webkit-overflow-scrolling: touch; /* CRUCIAL: smooth native scrolling in iOS WebViews */
+    padding-top: calc(50px + env(safe-area-inset-top)); /* Respects notches on mobile devices */
+    padding-bottom: calc(20px + env(safe-area-inset-bottom)); /* Respects home bars */
     box-sizing: border-box;
     /* Transition removed to prevent snapping; animations handle movement strictly */
   }
@@ -518,7 +521,7 @@
   /* Progress Bar */
   .progress-bar-wrapper {
     position: fixed;
-    top: 3px;
+    top: calc(3px + env(safe-area-inset-top)); /* Safe area for notches in WebViews */
     left: 4px;
     right: 4px;
     height: 4px;
@@ -538,7 +541,7 @@
   /* Navigation Pill (Bottom Right) */
   .nav-pill {
     position: fixed;
-    bottom: 30px;
+    bottom: calc(30px + env(safe-area-inset-bottom)); /* Safe area for iOS home bar */
     right: 35px;
     display: flex;
     background-color: var(--accent-color);
@@ -617,14 +620,15 @@
           align-items: center;
           justify-content: flex-start; /* Allows natural flow if content overflows */
           overflow-y: auto;
-          height: 100dvh; /* Mobile browser height fix */
-          padding-top: 60px; /* Mandatory restricted top area for mobile */
+          -webkit-overflow-scrolling: touch; /* Native mobile webview scroll physics */
+          /* Removed buggy 100dvh; relying on absolute top/bottom stretching from base class */
+          padding-top: calc(60px + env(safe-area-inset-top)); /* Mandatory restricted top area + notch safe zone */
       }
       
       .step-content {
           padding: 24px 20px;
           margin: auto 0; /* Ensures it stays vertically centered but scrolls safely */
-          padding-bottom: 100px; /* Prevents nav pill from hiding content */
+          padding-bottom: calc(100px + env(safe-area-inset-bottom)); /* Prevents nav pill from hiding content */
           flex-shrink: 0;
       }
 
@@ -694,7 +698,7 @@
 
       /* Shrink nav pill slightly for mobile */
       .nav-pill {
-          bottom: 20px;
+          bottom: calc(20px + env(safe-area-inset-bottom));
           right: 20px;
           transform: scale(0.9);
           transform-origin: bottom right;
