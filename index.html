@@ -60,6 +60,23 @@
       /* Push the nav pill higher to avoid Samsung's bottom toolbar */
       bottom: 80px !important; 
   }
+
+  /* Samsung Internet specific Autofill Fix to completely remove bluish background boxes */
+  body.is-samsung-browser .tf-input:-webkit-autofill,
+  body.is-samsung-browser .tf-input:-webkit-autofill:hover, 
+  body.is-samsung-browser .tf-input:-webkit-autofill:focus, 
+  body.is-samsung-browser .tf-input:-webkit-autofill:active,
+  body.is-samsung-browser .custom-dropdown-input:-webkit-autofill,
+  body.is-samsung-browser .custom-dropdown-input:-webkit-autofill:hover,
+  body.is-samsung-browser .custom-dropdown-input:-webkit-autofill:focus,
+  body.is-samsung-browser .custom-dropdown-input:-webkit-autofill:active {
+      -webkit-box-shadow: 0 0 0 1000px var(--bg-color) inset !important;
+      -webkit-text-fill-color: var(--accent-color) !important;
+      transition: background-color 5000s ease-in-out 0s !important;
+      background-color: var(--bg-color) !important;
+      background-image: none !important;
+      background-clip: padding-box !important;
+  }
   
   :root {
     --bg-color: #ffffff;
