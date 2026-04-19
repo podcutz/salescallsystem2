@@ -97,8 +97,8 @@
     overflow: hidden; /* Hide scrollbars for the full-screen effect */
     position: fixed; /* Locks the viewport completely in WebViews to prevent bounce/pull-to-refresh */
     overscroll-behavior-y: none;
-    -webkit-text-size-adjust: 100%; /* Prevents Samsung/iOS from inflating text sizes */
-    text-size-adjust: 100%;
+    -webkit-text-size-adjust: none !important; /* Forces total disable of inflation algorithms */
+    text-size-adjust: none !important;
   }
 
   /* The main container */
@@ -1151,6 +1151,26 @@
       // 3. Detect Samsung Internet specifically
       if (isSamsung) {
           body.classList.add('is-samsung-browser');
+          
+          // NUCLEAR OPTION: Reverse-scale to defeat Samsung's aggressive "Webpage text size" slider
+          try {
+              const testEl = document.createElement('div');
+              // Create an invisible 10px text element
+              testEl.style.cssText = 'position:absolute; visibility:hidden; font-size:10px; line-height:1; top:-9999px; margin:0; padding:0;';
+              testEl.innerText = 'A';
+              document.body.appendChild(testEl);
+              
+              // Measure what Samsung ACTUALLY rendered it as
+              const computedSize = parseFloat(window.getComputedStyle(testEl).fontSize);
+              document.body.removeChild(testEl);
+              
+              // If Samsung inflated the 10px text, calculate the exact opposite ratio
+              if (computedSize > 10.1 || computedSize < 9.9) {
+                  const scaleRatio = 10 / computedSize;
+                  // Apply webkit zoom to the root to neutralize the font explosion
+                  document.documentElement.style.zoom = scaleRatio;
+              }
+          } catch(e) { console.warn("Reverse scale failed", e); }
       }
   }
 
