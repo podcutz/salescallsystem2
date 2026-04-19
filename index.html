@@ -97,6 +97,8 @@
     overflow: hidden; /* Hide scrollbars for the full-screen effect */
     position: fixed; /* Locks the viewport completely in WebViews to prevent bounce/pull-to-refresh */
     overscroll-behavior-y: none;
+    -webkit-text-size-adjust: 100%; /* Prevents Samsung/iOS from inflating text sizes */
+    text-size-adjust: 100%;
   }
 
   /* The main container */
