@@ -39,48 +39,6 @@
       height: 100dvh !important; 
   }
 
-  /* 4. If we detect SAMSUNG INTERNET specifically */
-  body.is-samsung-browser {
-      /* God Fix: Release the right/bottom constraints. The JS will perfectly force pixel bounds. */
-      position: fixed !important;
-      top: 0 !important;
-      left: 0 !important;
-      width: 100vw !important;
-      height: 100vh !important;
-  }
-  
-  body.is-samsung-browser .step {
-      /* Restore 100% inheritance so it exactly matches the JS-forced body dimensions */
-      position: absolute !important;
-      height: 100% !important;
-      width: 100% !important;
-      top: 0 !important;
-      left: 0 !important;
-      padding-bottom: 120px !important; /* Extra padding to clear Samsung's bottom action bar */
-  }
-
-  body.is-samsung-browser .nav-pill {
-      /* Push the nav pill higher to avoid Samsung's bottom toolbar */
-      bottom: 80px !important; 
-  }
-
-  /* Samsung Internet specific Autofill Fix to completely remove bluish background boxes */
-  body.is-samsung-browser .tf-input:-webkit-autofill,
-  body.is-samsung-browser .tf-input:-webkit-autofill:hover, 
-  body.is-samsung-browser .tf-input:-webkit-autofill:focus, 
-  body.is-samsung-browser .tf-input:-webkit-autofill:active,
-  body.is-samsung-browser .custom-dropdown-input:-webkit-autofill,
-  body.is-samsung-browser .custom-dropdown-input:-webkit-autofill:hover,
-  body.is-samsung-browser .custom-dropdown-input:-webkit-autofill:focus,
-  body.is-samsung-browser .custom-dropdown-input:-webkit-autofill:active {
-      -webkit-box-shadow: 0 0 0 1000px var(--bg-color) inset !important;
-      -webkit-text-fill-color: var(--accent-color) !important;
-      transition: background-color 5000s ease-in-out 0s !important;
-      background-color: var(--bg-color) !important;
-      background-image: none !important;
-      background-clip: padding-box !important;
-  }
-  
   :root {
     --bg-color: #ffffff;
     --text-color: #000000;
@@ -763,17 +721,21 @@
           word-wrap: break-word; /* Breaks long text so it doesn't push off screen */
       }
 
-      /* Perfect 6-5 staggered pyramid layout for Q5 scale on mobile */
+      /* Perfect 6-5 staggered pyramid layout for Q5 scale on mobile (Dynamic Viewport Size) */
       .scale-container {
           margin-left: 0;
           width: 100%;
           justify-content: center; 
-          gap: 6px; /* Balanced gap to allow larger circles */
+          gap: 5px; /* Fixed safe gap to prevent mathematical overflowing */
       }
       .scale-label {
-          width: 52px; /* Increased to fully and easily occupy mobile screen width */
-          height: 52px;
-          font-size: 20px;
+          /* Mathematically guarantees 6 circles always fit: (100% container width - 5 gaps * 5px) / 6 */
+          width: calc((100% - 25px) / 6); 
+          height: auto; 
+          aspect-ratio: 1; /* Forces the height to exactly match the dynamically calculated width */
+          max-width: 50px; 
+          max-height: 50px;
+          font-size: clamp(12px, 3.5vw, 18px); /* Safe font scaling for smaller circles */
       }
       .mobile-break {
           display: block;
@@ -795,21 +757,47 @@
           overflow: hidden; /* Fixed on screen, prevents the whole view from scrolling up */
       }
       #step-10 .step-content {
-          margin-top: 0;
+          margin-top: -2vh; /* Moves the entire card slightly up vertically */
+          margin-bottom: 0; 
           padding-bottom: 0;
+          flex: 1; /* Forces the content to fill the remaining screen space */
+          min-height: 0; /* CRITICAL: Allows inner elements to shrink and not push off-screen */
+          display: flex;
+          flex-direction: column;
+      }
+      
+      #step-10 .step-content > div {
+          flex: 1;
+          min-height: 0;
+          justify-content: flex-start !important; /* CRITICAL: Pins the calendar permanently to the top, removing the jump jitter */
+      }
+      
+      #step-10 .step-content .gap-4 {
+          flex: 1;
+          min-height: 0;
+          justify-content: flex-start !important; /* CRITICAL: Locks the inner wrapper to the top so it never jitters upwards */
       }
       
       #timeSlotsContainer.open {
-          width: 100%; /* Explicit full width to widen viewport */
+          width: 100%; 
           max-width: 100%;
-          height: 400px; /* Increased to perfectly match desktop viewport height */
+          flex: 1; /* Dynamically takes exactly the remaining screen height, no more, no less */
+          min-height: 0; /* Ensures it never pushes below the screen border */
+          height: auto;
           margin-left: 0;
-          margin-top: 1.5rem;
+          margin-top: 1rem;
+          overflow-y: hidden !important; /* Locks the header in place so it cannot scroll away */
+          padding-right: 0px; 
+          padding-bottom: 0px; /* Padding moved to the inner scroll list */
       }
       
       #timeSlotsList {
-          height: 340px !important; /* Increased vertically to allow more slots to show */
-          overflow-y: auto; /* Enforces clean scroll bar inside the extended list */
+          flex: 1; /* Takes all remaining space below the fixed header */
+          min-height: 0;
+          height: auto !important; 
+          overflow-y: auto !important; /* Restores scrolling strictly to the time slots only */
+          padding-right: 4px; 
+          padding-bottom: 90px; /* Extra space at the bottom so the last slot clears the navigation pill */
       }
 
       .time-slot-btn {
@@ -1049,10 +1037,10 @@
     </div>
 
     <div class="step" id="step-10">
-      <div class="step-content" style="max-width: 900px; width: 100%; padding-top: 0; padding-bottom: 0;">
-        <div class="flex flex-col items-center justify-center w-full">
+      <div class="step-content" style="max-width: 900px; width: 100%; padding-top: 0; padding-bottom: 0; margin-top: 0vh; margin-bottom: auto;">
+        <div class="flex flex-col items-center justify-start w-full">
           <img src="https://res.cloudinary.com/dobnqmfsg/image/upload/q_auto/f_auto/v1776510599/Untitled_design__3_-removebg-preview_xoxdtc.png" alt="Logo" class="w-16 mb-4 mt-0">
-          <div class="flex flex-col md:flex-row items-start justify-center w-full gap-4">
+          <div class="flex flex-col md:flex-row items-start justify-start md:justify-center w-full gap-4">
             
             <div class="w-full max-w-[380px] bg-white p-4 rounded-2xl border border-[rgba(3,35,48,0.1)] shadow-2xl">
                 <div class="mb-3 flex justify-between items-center relative z-[5000]">
@@ -1107,11 +1095,7 @@
 
     <div class="step" id="step-11">
       <div class="step-content text-center flex flex-col items-center">
-        <div class="w-20 h-20 bg-[var(--accent-color)] text-white rounded-full flex items-center justify-center mb-6">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-            </svg>
-        </div>
+        <img src="https://res.cloudinary.com/dobnqmfsg/image/upload/q_auto/f_auto/v1776510599/Untitled_design__3_-removebg-preview_xoxdtc.png" alt="Success Logo" class="w-24 mb-6 drop-shadow-sm">
         <h1 class="text-4xl font-light mb-4 text-[var(--accent-color)]">You're all set!</h1>
         <p class="text-[rgba(3,35,48,0.6)] max-w-md mx-auto leading-relaxed text-lg">We've sent a confirmation email with the meeting details. Our team is excited to help you scale.</p>
       </div>
@@ -1121,20 +1105,51 @@
 </form>
 
 <script>
-  // --- ENVIRONMENT DETECTION ---
+  // --- ENVIRONMENT DETECTION & ROUTING ENGINE ---
   function detectEnvironment() {
       const ua = navigator.userAgent || navigator.vendor || window.opera;
+      const uaLower = ua.toLowerCase();
       const body = document.body;
 
-      // 1. Detect if it's a mobile device generally
-      const isMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(ua.toLowerCase());
+      // 1. THE CHROME ENFORCER (Android Only)
+      const isAndroid = /android/i.test(uaLower);
+      // Determine if it's "True Chrome" (Must have 'chrome', but NOT be Samsung, Edge, Opera, Brave, etc.)
+      const isTrueChrome = /chrome/i.test(uaLower) && !/samsungbrowser|edg|opr|brave/i.test(uaLower);
+
+      if (isAndroid && !isTrueChrome) {
+          // Grab the exact current URL dynamically (without the https:// prefix)
+          const currentHostPath = window.location.host + window.location.pathname + window.location.search;
+          const intentUrl = "intent://" + currentHostPath + "#Intent;scheme=https;package=com.android.chrome;end;";
+
+          // Attempt to force-open Chrome via Intent
+          window.location.href = intentUrl;
+
+          // If intent fails or is blocked by an app (like Instagram), render a clean fallback UI after 1.5s
+          setTimeout(() => {
+              document.body.innerHTML = `
+                  <div style="height: 100dvh; width: 100vw; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; text-align: center; background-color: var(--bg-color); color: var(--accent-color); font-family: var(--font-family); box-sizing: border-box;">
+                      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 20px;"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="4"></circle><line x1="21.17" y1="8" x2="12" y2="8"></line><line x1="3.95" y1="6.06" x2="8.54" y2="14"></line><line x1="10.88" y1="21.94" x2="15.46" y2="14"></line></svg>
+                      <h2 style="font-size: 24px; margin-bottom: 10px; font-weight: bold;">Chrome Recommended</h2>
+                      <p style="font-size: 16px; margin-bottom: 30px; opacity: 0.8; max-width: 300px;">To ensure the best experience and prevent glitches, please open this page securely in Google Chrome.</p>
+                      <a href="${intentUrl}" style="background-color: var(--accent-color); color: #fff; padding: 14px 28px; border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 16px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">Open in Chrome</a>
+                      <p style="font-size: 13px; opacity: 0.6; line-height: 1.5; margin-bottom: 10px;">If the button doesn't work, tap the <strong>three dots</strong> in the corner and select <strong>"Open in external browser"</strong>.</p>
+                      <p style="font-size: 12px; opacity: 0.4;"><br><a href="https://play.google.com/store/apps/details?id=com.android.chrome" style="color: var(--accent-color); text-decoration: underline;">Install from Play Store</a></p>
+                  </div>
+              `;
+          }, 1500);
+
+          return; // HALT execution of the rest of the form to prevent buggy rendering
+      }
+
+      // 2. Standard Mobile Detection (Executes if iOS, Desktop, or True Android Chrome)
+      const isMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(uaLower);
       if (isMobile) {
           body.classList.add('is-mobile');
       } else {
           body.classList.add('is-desktop');
       }
 
-      // 2. Detect notorious In-App Browsers via UA strings
+      // 3. Fallback In-App Browser Detection (For iOS mostly)
       const rules = [
           'FBAV', 'FBAN', // Facebook
           'Instagram',    // Instagram
@@ -1145,58 +1160,10 @@
       ];
       
       const isInApp = rules.some(rule => ua.indexOf(rule) > -1);
-      const isSamsung = /SamsungBrowser/i.test(ua);
       
       if (isInApp) {
           body.classList.add('is-in-app-browser');
-          // Optional: You can even detect which specific one if needed
           if (ua.indexOf('LinkedInApp') > -1) body.classList.add('is-linkedin');
-      }
-
-      // 3. Detect Samsung Internet specifically
-      if (isSamsung) {
-          body.classList.add('is-samsung-browser');
-          
-          // NUCLEAR OPTION: Reverse-scale to defeat Samsung's aggressive "Webpage text size" slider
-          try {
-              const testEl = document.createElement('div');
-              // Create an invisible 10px text element
-              testEl.style.cssText = 'position:absolute; visibility:hidden; font-size:10px; line-height:1; top:-9999px; margin:0; padding:0;';
-              testEl.innerText = 'A';
-              document.body.appendChild(testEl);
-              
-              // Measure what Samsung ACTUALLY rendered it as
-              const computedSize = parseFloat(window.getComputedStyle(testEl).fontSize);
-              document.body.removeChild(testEl);
-              
-              // If Samsung inflated the 10px text, calculate the exact opposite ratio
-              if (computedSize > 10.1 || computedSize < 9.9) {
-                  const scaleRatio = 10 / computedSize;
-                  // Apply webkit zoom to the root to neutralize the font explosion
-                  document.documentElement.style.zoom = scaleRatio;
-                  
-                  // GOD FIX FOR HALF-SCREEN CUTOFF:
-                  // When the keyboard opens/closes, physical bounds break. We use JS to surgically 
-                  // force the width and height in exact pixels, inversing the zoom ratio in real-time.
-                  function forceSamsungPixelBounds() {
-                      const trueWidth = window.innerWidth / scaleRatio;
-                      const trueHeight = window.innerHeight / scaleRatio;
-                      
-                      document.body.style.setProperty('width', trueWidth + 'px', 'important');
-                      document.body.style.setProperty('height', trueHeight + 'px', 'important');
-                      
-                      const fc = document.getElementById('form-container');
-                      if (fc) {
-                          fc.style.setProperty('width', trueWidth + 'px', 'important');
-                          fc.style.setProperty('height', trueHeight + 'px', 'important');
-                      }
-                  }
-                  
-                  // Run instantly and bind to screen resizes (keyboard opening/closing)
-                  forceSamsungPixelBounds();
-                  window.addEventListener('resize', forceSamsungPixelBounds);
-              }
-          } catch(e) { console.warn("Reverse scale failed", e); }
       }
   }
 
@@ -1303,6 +1270,7 @@
   // "Go Forward" Navigation Logic (relies on existing validation)
   if (navDownBtn) {
     navDownBtn.addEventListener('click', () => {
+      if (currentStep === 9) return; // Prevent arrow navigation on the Calendar step (forces Book Now)
       goToStep(currentStep + 1);
     });
   }
