@@ -41,19 +41,21 @@
 
   /* 4. If we detect SAMSUNG INTERNET specifically */
   body.is-samsung-browser {
-      /* Samsung Internet handles body fixed positioning weirdly. */
-      /* We release the fixed lock on body to let Samsung's native UI flex naturally. */
-      position: relative !important;
-      height: 100dvh !important;
+      /* Lock body to physical 100% to prevent the half-screen keyboard-collapse bug */
+      position: fixed !important;
+      height: 100% !important;
+      width: 100% !important;
   }
   
   body.is-samsung-browser .step {
-      /* Anchor steps to dynamic viewport height rather than absolute stretching */
-      position: absolute;
-      height: 100dvh !important;
-      top: 0;
-      bottom: auto;
-      padding-bottom: 140px !important; /* Extra padding to clear Samsung's bottom action bar */
+      /* Restore absolute stretching to guarantee full screen utilization */
+      position: absolute !important;
+      height: auto !important;
+      top: 0 !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      padding-bottom: 120px !important; /* Extra padding to clear Samsung's bottom action bar */
   }
 
   body.is-samsung-browser .nav-pill {
@@ -103,9 +105,13 @@
 
   /* The main container */
   #form-container {
-    height: 100vh;
+    height: 100%;
     width: 100%;
-    position: relative;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
   }
 
   /* Each question takes up exactly one full screen securely via absolute coordinates */
