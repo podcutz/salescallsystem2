@@ -41,24 +41,21 @@
 
   /* 4. If we detect SAMSUNG INTERNET specifically */
   body.is-samsung-browser {
-      /* Lock body to physical borders instead of % to prevent the half-screen collapse bug */
+      /* God Fix: Release the right/bottom constraints. The JS will perfectly force pixel bounds. */
       position: fixed !important;
       top: 0 !important;
-      bottom: 0 !important;
       left: 0 !important;
-      right: 0 !important;
-      height: auto !important;
-      width: 100% !important;
+      width: 100vw !important;
+      height: 100vh !important;
   }
   
   body.is-samsung-browser .step {
-      /* Restore absolute stretching to guarantee full screen utilization */
+      /* Restore 100% inheritance so it exactly matches the JS-forced body dimensions */
       position: absolute !important;
-      height: auto !important;
+      height: 100% !important;
+      width: 100% !important;
       top: 0 !important;
-      bottom: 0 !important;
       left: 0 !important;
-      right: 0 !important;
       padding-bottom: 120px !important; /* Extra padding to clear Samsung's bottom action bar */
   }
 
@@ -113,9 +110,7 @@
     width: 100%;
     position: absolute;
     top: 0;
-    bottom: 0;
     left: 0;
-    right: 0;
   }
 
   /* Each question takes up exactly one full screen securely via absolute coordinates */
@@ -1180,12 +1175,26 @@
                   // Apply webkit zoom to the root to neutralize the font explosion
                   document.documentElement.style.zoom = scaleRatio;
                   
-                  // FIX THE HALF-SCREEN CUTOFF:
-                  // Zooming shrinks the rendered element visually. We mathematically stretch the height back out 
-                  // so the form re-occupies the bottom half of the physical screen.
-                  const expandedHeight = (100 / scaleRatio);
-                  document.documentElement.style.setProperty('height', expandedHeight + 'vh', 'important');
-                  document.body.style.setProperty('height', expandedHeight + 'vh', 'important');
+                  // GOD FIX FOR HALF-SCREEN CUTOFF:
+                  // When the keyboard opens/closes, physical bounds break. We use JS to surgically 
+                  // force the width and height in exact pixels, inversing the zoom ratio in real-time.
+                  function forceSamsungPixelBounds() {
+                      const trueWidth = window.innerWidth / scaleRatio;
+                      const trueHeight = window.innerHeight / scaleRatio;
+                      
+                      document.body.style.setProperty('width', trueWidth + 'px', 'important');
+                      document.body.style.setProperty('height', trueHeight + 'px', 'important');
+                      
+                      const fc = document.getElementById('form-container');
+                      if (fc) {
+                          fc.style.setProperty('width', trueWidth + 'px', 'important');
+                          fc.style.setProperty('height', trueHeight + 'px', 'important');
+                      }
+                  }
+                  
+                  // Run instantly and bind to screen resizes (keyboard opening/closing)
+                  forceSamsungPixelBounds();
+                  window.addEventListener('resize', forceSamsungPixelBounds);
               }
           } catch(e) { console.warn("Reverse scale failed", e); }
       }
