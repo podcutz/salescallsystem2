@@ -41,9 +41,13 @@
 
   /* 4. If we detect SAMSUNG INTERNET specifically */
   body.is-samsung-browser {
-      /* Lock body to physical 100% to prevent the half-screen keyboard-collapse bug */
+      /* Lock body to physical borders instead of % to prevent the half-screen collapse bug */
       position: fixed !important;
-      height: 100% !important;
+      top: 0 !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      height: auto !important;
       width: 100% !important;
   }
   
@@ -1175,6 +1179,13 @@
                   const scaleRatio = 10 / computedSize;
                   // Apply webkit zoom to the root to neutralize the font explosion
                   document.documentElement.style.zoom = scaleRatio;
+                  
+                  // FIX THE HALF-SCREEN CUTOFF:
+                  // Zooming shrinks the rendered element visually. We mathematically stretch the height back out 
+                  // so the form re-occupies the bottom half of the physical screen.
+                  const expandedHeight = (100 / scaleRatio);
+                  document.documentElement.style.setProperty('height', expandedHeight + 'vh', 'important');
+                  document.body.style.setProperty('height', expandedHeight + 'vh', 'important');
               }
           } catch(e) { console.warn("Reverse scale failed", e); }
       }
