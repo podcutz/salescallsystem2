@@ -420,20 +420,20 @@
     margin-left: 35px;
     margin-bottom: 30px;
     flex-wrap: wrap;
-    max-width: 800px;
+    max-width: 100%;
   }
 
   .scale-label {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 48px;
-    height: 48px;
+    width: 56px;
+    height: 56px;
     background-color: rgba(3, 35, 48, 0.03);
     border: 1px solid rgba(3, 35, 48, 0.15);
     border-radius: 50%;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 18px;
     color: var(--accent-color);
     transition: all 0.2s ease;
   }
@@ -708,75 +708,76 @@
       }
 
       /* Snap all elements to the left edge of the centered imaginary container safely */
-      .description, 
-      .input-wrapper, 
-      .button-wrapper, 
-      .choice-container, 
-      .statement-list, 
-      .custom-dropdown-container {
-          margin-left: 0;
-          width: 100%;
-          max-width: 100%; /* Safety guard against screen overflow */
-          box-sizing: border-box; /* Forces padding/borders inward */
-          word-wrap: break-word; /* Breaks long text so it doesn't push off screen */
-      }
+          .description, 
+          .input-wrapper, 
+          .button-wrapper, 
+          .choice-container, 
+          .statement-list, 
+          .custom-dropdown-container,
+          .input-label {
+              margin-left: 0 !important; /* !important forces the override of inline sub-question styles */
+              width: 100%;
+              max-width: 100%; /* Safety guard against screen overflow */
+              box-sizing: border-box; /* Forces padding/borders inward */
+              word-wrap: break-word; /* Breaks long text so it doesn't push off screen */
+          }
 
-      /* Perfect 6-5 staggered pyramid layout for Q5 scale on mobile (Dynamic Viewport Size) */
-      .scale-container {
-          margin-left: 0;
-          width: 100%;
-          justify-content: center; 
-          gap: 5px; /* Fixed safe gap to prevent mathematical overflowing */
-      }
-      .scale-label {
-          /* Mathematically guarantees 6 circles always fit: (100% container width - 5 gaps * 5px) / 6 */
-          width: calc((100% - 25px) / 6); 
-          height: auto; 
-          aspect-ratio: 1; /* Forces the height to exactly match the dynamically calculated width */
-          max-width: 50px; 
-          max-height: 50px;
-          font-size: clamp(12px, 3.5vw, 18px); /* Safe font scaling for smaller circles */
-      }
-      .mobile-break {
-          display: block;
-          flex-basis: 100%;
-          height: 0;
-          margin: 0;
-      }
+          /* Perfect 6-5 staggered pyramid layout for Q5 scale on mobile (Dynamic Viewport Size) */
+          .scale-container {
+              margin-left: 0;
+              width: 100%;
+              justify-content: center; 
+              gap: 5px; /* Fixed safe gap to prevent mathematical overflowing */
+          }
+          .scale-label {
+              /* Mathematically guarantees 6 circles always fit: (100% container width - 5 gaps * 5px) / 6 */
+              width: calc((100% - 25px) / 6); 
+              height: auto; 
+              aspect-ratio: 1; /* Forces the height to exactly match the dynamically calculated width */
+              max-width: 50px; 
+              max-height: 50px;
+              font-size: clamp(12px, 3.5vw, 18px); /* Safe font scaling for smaller circles */
+          }
+          .mobile-break {
+              display: block;
+              flex-basis: 100%;
+              height: 0;
+              margin: 0;
+          }
 
-      /* Shrink nav pill slightly for mobile */
-      .nav-pill {
-          bottom: calc(20px + env(safe-area-inset-bottom));
-          right: 20px;
-          transform: scale(0.9);
-          transform-origin: bottom right;
-      }
-      
-      /* Mobile Calendar & Time Slot Adjustments */
-      #step-10 {
-          overflow: hidden; /* Fixed on screen, prevents the whole view from scrolling up */
-      }
-      #step-10 .step-content {
-          margin-top: -2vh; /* Moves the entire card slightly up vertically */
-          margin-bottom: 0; 
-          padding-bottom: 0;
-          flex: 1; /* Forces the content to fill the remaining screen space */
-          min-height: 0; /* CRITICAL: Allows inner elements to shrink and not push off-screen */
-          display: flex;
-          flex-direction: column;
-      }
-      
-      #step-10 .step-content > div {
-          flex: 1;
-          min-height: 0;
-          justify-content: flex-start !important; /* CRITICAL: Pins the calendar permanently to the top, removing the jump jitter */
-      }
-      
-      #step-10 .step-content .gap-4 {
-          flex: 1;
-          min-height: 0;
-          justify-content: flex-start !important; /* CRITICAL: Locks the inner wrapper to the top so it never jitters upwards */
-      }
+          /* Shrink nav pill slightly for mobile */
+          .nav-pill {
+              bottom: calc(20px + env(safe-area-inset-bottom));
+              right: 20px;
+              transform: scale(0.9);
+              transform-origin: bottom right;
+          }
+          
+          /* Mobile Calendar & Time Slot Adjustments */
+          #step-9 {
+              overflow: hidden; /* Fixed on screen, prevents the whole view from scrolling up */
+          }
+          #step-9 .step-content {
+              margin-top: -2vh; /* Moves the entire card slightly up vertically */
+              margin-bottom: 0; 
+              padding-bottom: 0;
+              flex: 1; /* Forces the content to fill the remaining screen space */
+              min-height: 0; /* CRITICAL: Allows inner elements to shrink and not push off-screen */
+              display: flex;
+              flex-direction: column;
+          }
+          
+          #step-9 .step-content > div {
+              flex: 1;
+              min-height: 0;
+              justify-content: flex-start !important; /* CRITICAL: Pins the calendar permanently to the top, removing the jump jitter */
+          }
+          
+          #step-9 .step-content .gap-4 {
+              flex: 1;
+              min-height: 0;
+              justify-content: flex-start !important; /* CRITICAL: Locks the inner wrapper to the top so it never jitters upwards */
+          }
       
       #timeSlotsContainer.open {
           width: 100%; 
@@ -856,11 +857,22 @@
       <div class="step-content">
         <div class="question-header">
           <span class="question-number">2</span>
-          <span>What's your company website?</span>
+          <span>About your business:</span>
         </div>
         
-        <div class="input-wrapper">
+        <label class="input-label" style="margin-left: 35px; margin-top: 10px;">What is your company website?</label>
+        <div class="input-wrapper" style="margin-bottom: 40px;">
           <input type="text" name="website" class="tf-input" placeholder="www.yourwebsite.com" pattern="^(https?:\/\/)?([\w\-]+\.)+[a-zA-Z]{2,}(\/\S*)?$" title="Please enter a valid website link (e.g., www.example.com or https://example.com)" required>
+        </div>
+        
+        <label class="input-label" style="margin-left: 35px;">What is your company's annual revenue?</label>
+        <div class="choice-container">
+          <label class="choice-label"><input type="radio" name="revenue" value="under $5M" required><span class="choice-letter">A</span><span class="choice-text">under $5M</span></label>
+          <label class="choice-label"><input type="radio" name="revenue" value="$5M-10M" required><span class="choice-letter">B</span><span class="choice-text">$5M-10M</span></label>
+          <label class="choice-label"><input type="radio" name="revenue" value="$10M - $25M" required><span class="choice-letter">C</span><span class="choice-text">$10M - $25M</span></label>
+          <label class="choice-label"><input type="radio" name="revenue" value="$25M - $100M" required><span class="choice-letter">D</span><span class="choice-text">$25M - $100M</span></label>
+          <label class="choice-label"><input type="radio" name="revenue" value="$100M - $1B" required><span class="choice-letter">E</span><span class="choice-text">$100M - $1B</span></label>
+          <label class="choice-label"><input type="radio" name="revenue" value="1B+" required><span class="choice-letter">F</span><span class="choice-text">1B+</span></label>
         </div>
         
         <div class="button-wrapper">
@@ -874,28 +886,25 @@
       <div class="step-content">
         <div class="question-header">
           <span class="question-number">3</span>
-          <span>What is the size of your company? </span>
+          <span>What do you need help with?</span>
         </div>
-        
-        
-        <div class="choice-container">
-          <label class="choice-label">
-            <input type="radio" name="company_size" value="Small" required>
-            <span class="choice-letter">A</span>
-            <span class="choice-text">Small (1-50 employees)</span>
-          </label>
-          <label class="choice-label">
-            <input type="radio" name="company_size" value="Medium" required>
-            <span class="choice-letter">B</span>
-            <span class="choice-text">Medium (51-500 employees)</span>
-          </label>
-          <label class="choice-label">
-            <input type="radio" name="company_size" value="Large" required>
-            <span class="choice-letter">C</span>
-            <span class="choice-text">Large (501+ employees)</span>
-          </label>
+        <div class="description" style="font-size: 14px; margin-top: -10px;">Select multiple if required.</div>
+        <div class="custom-dropdown-container" id="container-q3">
+          <div class="custom-dropdown-header">
+            <input type="text" id="q3-input" class="custom-dropdown-input" placeholder="Type or select options" autocomplete="off" required>
+            <svg class="custom-dropdown-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </div>
+          <div id="q3-list" class="custom-dropdown-list" style="display: none;">
+            <div class="dropdown-item multi-item" data-value="Personal LinkedIn account">Personal LinkedIn account</div>
+            <div class="dropdown-item multi-item" data-value="Company LinkedIn page">Company LinkedIn page</div>
+            <div class="dropdown-item multi-item" data-value="Personal Instagram account">Personal Instagram account</div>
+            <div class="dropdown-item multi-item" data-value="Company Instagram page">Company Instagram page</div>
+            <div class="dropdown-item multi-item" data-value="TikTok account">TikTok account</div>
+            <div class="dropdown-item multi-item" data-value="YouTube account">YouTube account</div>
+            <div class="dropdown-item multi-other" data-value="Other">Other: (Type your answer)</div>
+          </div>
+          <input type="hidden" name="needs_help" id="q3-hidden">
         </div>
-        
         <div class="button-wrapper">
           <button type="button" class="btn-submit next-btn">OK</button>
           <span class="hint">press <strong>Enter ↵</strong></span>
@@ -907,15 +916,25 @@
       <div class="step-content">
         <div class="question-header">
           <span class="question-number">4</span>
-          <span>What is your company's annual revenue? </span>
+          <span>What are your main goals?</span>
         </div>
-        <div class="choice-container">
-          <label class="choice-label"><input type="radio" name="revenue" value="under $5M" required><span class="choice-letter">A</span><span class="choice-text">under $5M</span></label>
-          <label class="choice-label"><input type="radio" name="revenue" value="$5M-10M" required><span class="choice-letter">B</span><span class="choice-text">$5M-10M</span></label>
-          <label class="choice-label"><input type="radio" name="revenue" value="$10M - $25M" required><span class="choice-letter">C</span><span class="choice-text">$10M - $25M</span></label>
-          <label class="choice-label"><input type="radio" name="revenue" value="$25M - $100M" required><span class="choice-letter">D</span><span class="choice-text">$25M - $100M</span></label>
-          <label class="choice-label"><input type="radio" name="revenue" value="$100M - $1B" required><span class="choice-letter">E</span><span class="choice-text">$100M - $1B</span></label>
-          <label class="choice-label"><input type="radio" name="revenue" value="1B+" required><span class="choice-letter">F</span><span class="choice-text">1B+</span></label>
+        <div class="description" style="font-size: 14px; margin-top: -10px;">Select multiple if required.</div>
+        <div class="custom-dropdown-container" id="container-q4">
+          <div class="custom-dropdown-header">
+            <input type="text" id="q4-input" class="custom-dropdown-input" placeholder="Type or select options" autocomplete="off" required>
+            <svg class="custom-dropdown-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </div>
+          <div id="q4-list" class="custom-dropdown-list" style="display: none;">
+            <div class="dropdown-item multi-item" data-value="Enhanced Brand Reputation">Enhanced Brand Reputation</div>
+            <div class="dropdown-item multi-item" data-value="Stronger Founder Storytelling">Stronger Founder Storytelling</div>
+            <div class="dropdown-item multi-item" data-value="Drive Traffic to Website">Drive Traffic to Website</div>
+            <div class="dropdown-item multi-item" data-value="Generate Leads">Generate Leads</div>
+            <div class="dropdown-item multi-item" data-value="Improve Engagement">Improve Engagement</div>
+            <div class="dropdown-item multi-item" data-value="Build a Community">Build a Community</div>
+            <div class="dropdown-item multi-item" data-value="Become a Go-To Industry Expert">Become a Go-To Industry Expert</div>
+            <div class="dropdown-item multi-other" data-value="Other">Other: (Type your answer)</div>
+          </div>
+          <input type="hidden" name="main_goals" id="q4-hidden">
         </div>
         <div class="button-wrapper">
           <button type="button" class="btn-submit next-btn">OK</button>
@@ -928,21 +947,23 @@
       <div class="step-content">
         <div class="question-header">
           <span class="question-number">5</span>
-          <span>How committed are you to investing in long-term success with organic content? </span>
+          <span>On a scale of 1-10, how much does the following statement apply to your business? </span>
         </div>
+        
+        <div class="description" style="color: var(--text-color); font-weight: 500;">"We are a founder-led brand."</div>
         <div class="scale-container">
-          <label class="scale-label"><input type="radio" name="commitment" value="0" required>0</label>
-          <label class="scale-label"><input type="radio" name="commitment" value="1" required>1</label>
-          <label class="scale-label"><input type="radio" name="commitment" value="2" required>2</label>
-          <label class="scale-label"><input type="radio" name="commitment" value="3" required>3</label>
-          <label class="scale-label"><input type="radio" name="commitment" value="4" required>4</label>
-          <label class="scale-label"><input type="radio" name="commitment" value="5" required>5</label>
+          <label class="scale-label"><input type="radio" name="founder_led" value="0" required>0</label>
+          <label class="scale-label"><input type="radio" name="founder_led" value="1" required>1</label>
+          <label class="scale-label"><input type="radio" name="founder_led" value="2" required>2</label>
+          <label class="scale-label"><input type="radio" name="founder_led" value="3" required>3</label>
+          <label class="scale-label"><input type="radio" name="founder_led" value="4" required>4</label>
+          <label class="scale-label"><input type="radio" name="founder_led" value="5" required>5</label>
           <div class="mobile-break"></div>
-          <label class="scale-label"><input type="radio" name="commitment" value="6" required>6</label>
-          <label class="scale-label"><input type="radio" name="commitment" value="7" required>7</label>
-          <label class="scale-label"><input type="radio" name="commitment" value="8" required>8</label>
-          <label class="scale-label"><input type="radio" name="commitment" value="9" required>9</label>
-          <label class="scale-label"><input type="radio" name="commitment" value="10" required>10</label>
+          <label class="scale-label"><input type="radio" name="founder_led" value="6" required>6</label>
+          <label class="scale-label"><input type="radio" name="founder_led" value="7" required>7</label>
+          <label class="scale-label"><input type="radio" name="founder_led" value="8" required>8</label>
+          <label class="scale-label"><input type="radio" name="founder_led" value="9" required>9</label>
+          <label class="scale-label"><input type="radio" name="founder_led" value="10" required>10</label>
         </div>
         <div class="button-wrapper">
           <button type="button" class="btn-submit next-btn">OK</button>
@@ -955,6 +976,24 @@
       <div class="step-content">
         <div class="question-header">
           <span class="question-number">6</span>
+          <span>Do you have a team already working on this?</span>
+        </div>
+        <div class="choice-container">
+          <label class="choice-label"><input type="radio" name="team_status" value="Yes (Internal)" required><span class="choice-letter">A</span><span class="choice-text">Yes (Internal)</span></label>
+          <label class="choice-label"><input type="radio" name="team_status" value="Yes (External)" required><span class="choice-letter">B</span><span class="choice-text">Yes (External)</span></label>
+          <label class="choice-label"><input type="radio" name="team_status" value="No" required><span class="choice-letter">C</span><span class="choice-text">No</span></label>
+        </div>
+        <div class="button-wrapper">
+          <button type="button" class="btn-submit next-btn">OK</button>
+          <span class="hint">press <strong>Enter ↵</strong></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="step" id="step-7">
+      <div class="step-content">
+        <div class="question-header">
+          <span class="question-number">7</span>
           <span>Do both of these two statements describe you? </span>
         </div>
         <div class="description">Choose "no" if only one of these or none describe you</div>
@@ -973,30 +1012,20 @@
       </div>
     </div>
 
-    <div class="step" id="step-7">
-      <div class="step-content">
-        <div class="question-header">
-          <span class="question-number">7</span>
-          <span>Email address to contact you: </span>
-        </div>
-        <div class="input-wrapper">
-          <input type="email" name="email" class="tf-input" placeholder="name@example.com" required>
-        </div>
-        <div class="button-wrapper">
-          <button type="button" class="btn-submit next-btn">OK</button>
-          <span class="hint">press <strong>Enter ↵</strong></span>
-        </div>
-      </div>
-    </div>
-
     <div class="step" id="step-8">
       <div class="step-content">
         <div class="question-header">
           <span class="question-number">8</span>
-          <span>How did you hear about us? </span>
+          <span>Answer the following: </span>
         </div>
-        <div class="custom-dropdown-container">
-          
+        
+        <label class="input-label" style="margin-left: 35px; margin-top: 10px;">Email address to contact you:</label>
+        <div class="input-wrapper" style="margin-bottom: 40px;">
+          <input type="email" name="email" class="tf-input" placeholder="name@example.com" required>
+        </div>
+        
+        <label class="input-label" style="margin-left: 35px;">How did you hear about us?</label>
+        <div class="custom-dropdown-container" id="container-q8">
           <div class="custom-dropdown-header">
             <input type="text" id="q8-input" class="custom-dropdown-input" placeholder="Type or select an option" autocomplete="off" required>
             <svg class="custom-dropdown-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
@@ -1009,25 +1038,9 @@
             <div class="dropdown-item" data-value="Youtube">Youtube</div>
             <div class="dropdown-item" data-value="Referral">Referral</div>
             <div class="dropdown-item" data-value="Google">Google</div>
-            <div class="dropdown-item" data-value="Other">Other</div>
+            <div class="dropdown-item multi-other" data-value="Other">Other</div>
           </div>
           <input type="hidden" name="how_did_you_hear" id="q8-hidden">
-        </div>
-        <div class="button-wrapper">
-          <button type="button" class="btn-submit next-btn">OK</button>
-          <span class="hint">press <strong>Enter ↵</strong></span>
-        </div>
-      </div>
-    </div>
-
-    <div class="step" id="step-9">
-      <div class="step-content">
-        <div class="question-header">
-          <span class="question-number">9</span>
-          <span>Anything else we should know?</span>
-        </div>
-        <div class="input-wrapper">
-          <input type="text" name="anything_else" class="tf-input" placeholder="Type your answer here..." required>
         </div>
         <div class="button-wrapper">
           <button type="submit" class="btn-submit">Next</button>
@@ -1036,7 +1049,7 @@
       </div>
     </div>
 
-    <div class="step" id="step-10">
+    <div class="step" id="step-9">
       <div class="step-content" style="max-width: 900px; width: 100%; padding-top: 0; padding-bottom: 0; margin-top: 0vh; margin-bottom: auto;">
         <div class="flex flex-col items-center justify-start w-full">
           <img src="https://res.cloudinary.com/dobnqmfsg/image/upload/q_auto/f_auto/v1776510599/Untitled_design__3_-removebg-preview_xoxdtc.png" alt="Logo" class="w-16 mb-4 mt-0">
@@ -1093,7 +1106,7 @@
       </div>
     </div>
 
-    <div class="step" id="step-11">
+    <div class="step" id="step-10">
       <div class="step-content text-center flex flex-col items-center">
         <img src="https://res.cloudinary.com/dobnqmfsg/image/upload/q_auto/f_auto/v1776510599/Untitled_design__3_-removebg-preview_xoxdtc.png" alt="Success Logo" class="w-24 mb-6 drop-shadow-sm">
         <h1 class="text-4xl font-light mb-4 text-[var(--accent-color)]">You're all set!</h1>
@@ -1169,30 +1182,84 @@
 
   // Run detection immediately
   detectEnvironment();
-  // Dropdown Logic for Step 8
+  // Dropdown & Multi-Select Logic
   document.addEventListener('DOMContentLoaded', () => {
+    
+    // Helper function for Multi-Select (Steps 3 & 4)
+    function setupMultiSelect(inputId, listId, hiddenId, containerId) {
+        const input = document.getElementById(inputId);
+        const list = document.getElementById(listId);
+        const hidden = document.getElementById(hiddenId);
+        if(!input || !list) return;
+
+        let selectedValues = [];
+        const items = list.querySelectorAll('.multi-item');
+        const otherBtn = list.querySelector('.multi-other');
+
+        input.addEventListener('click', () => list.style.display = 'flex');
+        
+        input.addEventListener('input', (e) => {
+            hidden.value = e.target.value; // Allow manual typing overrides natively 
+        });
+
+        items.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const val = item.dataset.value;
+                if (selectedValues.includes(val)) {
+                    selectedValues = selectedValues.filter(v => v !== val);
+                    item.style.backgroundColor = "rgba(3, 35, 48, 0.03)";
+                    item.style.borderColor = "rgba(3, 35, 48, 0.15)";
+                } else {
+                    selectedValues.push(val);
+                    item.style.backgroundColor = "#ffffff";
+                    item.style.borderColor = "var(--accent-color)";
+                }
+                input.value = selectedValues.join(', ');
+                hidden.value = input.value;
+            });
+        });
+
+        if(otherBtn) {
+            otherBtn.addEventListener('click', () => {
+                list.style.display = 'none';
+                input.focus();
+            });
+        }
+
+        document.addEventListener('click', (e) => {
+            if(!e.target.closest('#' + containerId)) {
+                list.style.display = 'none';
+            }
+        });
+    }
+
+    // Initialize New Q3 & Q4 Multi-Selects
+    setupMultiSelect('q3-input', 'q3-list', 'q3-hidden', 'container-q3');
+    setupMultiSelect('q4-input', 'q4-list', 'q4-hidden', 'container-q4');
+
+    // Single Select for New Q8
     const ddInput = document.getElementById('q8-input');
     const ddList = document.getElementById('q8-list');
     const hiddenVal = document.getElementById('q8-hidden');
     
     if(ddInput) {
-      const items = ddList.querySelectorAll('.dropdown-item');
+      const items = ddList.querySelectorAll('.dropdown-item:not(.multi-other)');
+      const otherBtn = ddList.querySelector('.multi-other');
 
-      ddInput.addEventListener('click', () => {
-        ddList.style.display = 'flex';
-      });
+      ddInput.addEventListener('click', () => ddList.style.display = 'flex');
 
       ddInput.addEventListener('input', (e) => {
         ddList.style.display = 'flex';
         const val = e.target.value.toLowerCase();
         items.forEach(item => {
           if(item.textContent.toLowerCase().includes(val)) {
-            item.style.display = 'block';
+            item.style.display = 'flex';
           } else {
             item.style.display = 'none';
           }
         });
-        hiddenVal.value = e.target.value; // Allow custom typed answer tracking
+        hiddenVal.value = e.target.value; 
       });
 
       items.forEach(item => {
@@ -1200,17 +1267,18 @@
           ddInput.value = item.textContent.trim();
           hiddenVal.value = item.dataset.value;
           ddList.style.display = 'none';
-          
-          // Auto-advance
-          setTimeout(() => {
-            goToStep(currentStep + 1);
-          }, 300);
         });
       });
 
-      // Close dropdown if clicking outside the container
+      if(otherBtn) {
+          otherBtn.addEventListener('click', () => {
+              ddList.style.display = 'none';
+              ddInput.focus();
+          });
+      }
+
       document.addEventListener('click', (e) => {
-        if(!e.target.closest('.custom-dropdown-container')) {
+        if(!e.target.closest('#container-q8')) {
           ddList.style.display = 'none';
         }
       });
@@ -1270,7 +1338,7 @@
   // "Go Forward" Navigation Logic (relies on existing validation)
   if (navDownBtn) {
     navDownBtn.addEventListener('click', () => {
-      if (currentStep === 9) return; // Prevent arrow navigation on the Calendar step (forces Book Now)
+      if (currentStep === 8) return; // Prevent arrow navigation on the Calendar step (forces Book Now)
       goToStep(currentStep + 1);
     });
   }
@@ -1332,10 +1400,10 @@
     if (e.key === 'Enter') {
       e.preventDefault(); // Prevent accidental form submission
       
-      // If we are on step 9 (index 8), submit the form to proceed to Calendar
-      if (currentStep === 8) {
+      // If we are on step 8 (index 7), submit the form to proceed to Calendar
+      if (currentStep === 7) {
         document.getElementById('main-form').requestSubmit();
-      } else if (currentStep < 8) {
+      } else if (currentStep < 7) {
         goToStep(currentStep + 1);
       }
     }
@@ -1344,8 +1412,8 @@
   // Handle final submission and slide to Calendar
   document.getElementById('main-form').addEventListener('submit', function(e) {
     e.preventDefault();
-    // Slide to Step 10 (Calendar, which is index 9)
-    goToStep(9); 
+    // Slide to Step 9 (Calendar, which is index 8)
+    goToStep(8); 
     
     // Initialize the calendar assets as it comes into view
     if(window.initTimezones) window.initTimezones();
@@ -1767,8 +1835,8 @@
               body: JSON.stringify(payload)
           });
 
-          // Slide to Step 11 (Success Message, index 10)
-          goToStep(10); 
+          // Slide to Step 10 (Success Message, index 9)
+          goToStep(9); 
           
           // Optionally fade out progress bar once finished
           const pBar = document.querySelector('.progress-bar-fill');
