@@ -1805,9 +1805,25 @@
               return;
           }
 
+          
           // 2. RLS strictly prevents external leads from inserting into `meetings` (auth.uid() = host_id).
           // We MUST delegate the actual database insertion to the n8n webhook.
-          const emailInput = document.querySelector('input[name="email"]') ? document.querySelector('input[name="email"]').value : 'Unknown User';
+          
+          // Gather ALL answers from the form dynamically
+          const formElement = document.getElementById('main-form');
+          const formData = new FormData(formElement);
+          const allFormAnswers = Object.fromEntries(formData.entries());
+          
+          // Combine first name and last name into a single "Name" entry
+          const firstName = allFormAnswers.first_name || '';
+          const lastName = allFormAnswers.last_name || '';
+          allFormAnswers.Name = `${firstName} ${lastName}`.trim();
+          
+          // Remove the separated name fields so only the combined "Name" goes to the webhook
+          delete allFormAnswers.first_name;
+          delete allFormAnswers.last_name;
+          
+          const emailInput = allFormAnswers.email || 'Unknown User';
           
           const [y, m, d] = selectedDateStr.split('-').map(Number);
           const suffix = (d > 3 && d < 21) || d % 10 > 3 ? 'th' : ['th', 'st', 'nd', 'rd'][d % 10];
@@ -1821,6 +1837,7 @@
               target_profile_id: TARGET_PROFILE_ID,
               meeting_id: temporaryMeetingId,
               guest_email: emailInput,
+              form_data: allFormAnswers, // Injects the full questionnaire data (with combined Name) into n8n
               booking_details: {
                   date_selected: formattedDate,
                   starttime: activeSelectedSlot.timeUtc,
@@ -1832,7 +1849,10 @@
 
           const webhookResponse = await fetch(WEBHOOK_URL, {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              headers: { 
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json' 
+              },
               body: JSON.stringify(payload)
           });
 
