@@ -503,9 +503,27 @@
   .custom-dropdown-icon {
     position: absolute;
     right: 0;
-    bottom: 12px;
+    bottom: 8px;
+    z-index: 10; /* Ensures the icon is above the input text */
+    display: flex;
+    align-items: center;
+    justify-content: center;
     color: var(--accent-color);
+    background-color: rgba(255, 255, 255, 0.85); /* Clean, low-opacity white circle */
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
     pointer-events: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); /* Subtle shadow for depth */
+  }
+  .custom-dropdown-icon svg {
+    width: 20px;
+    height: 20px;
+    transform: rotate(90deg); /* Rotate the inner SVG arrow instead! */
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .custom-dropdown-icon.open svg {
+    transform: rotate(0deg); /* Spins smoothly to point down */
   }
   .custom-dropdown-list {
     position: absolute;
@@ -893,7 +911,9 @@
         <div class="custom-dropdown-container" id="container-q3">
           <div class="custom-dropdown-header">
             <input type="text" id="q3-input" class="custom-dropdown-input" placeholder="Type or select options" autocomplete="off" required>
-            <svg class="custom-dropdown-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            <div class="custom-dropdown-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
           </div>
           <div id="q3-list" class="custom-dropdown-list" style="display: none;">
             <div class="dropdown-item multi-item" data-value="Personal LinkedIn account">Personal LinkedIn account</div>
@@ -923,7 +943,9 @@
         <div class="custom-dropdown-container" id="container-q4">
           <div class="custom-dropdown-header">
             <input type="text" id="q4-input" class="custom-dropdown-input" placeholder="Type or select options" autocomplete="off" required>
-            <svg class="custom-dropdown-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            <div class="custom-dropdown-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
           </div>
           <div id="q4-list" class="custom-dropdown-list" style="display: none;">
             <div class="dropdown-item multi-item" data-value="Enhanced Brand Reputation">Enhanced Brand Reputation</div>
@@ -1027,9 +1049,12 @@
         
         <label class="input-label" style="margin-left: 35px;">How did you hear about us?</label>
         <div class="custom-dropdown-container" id="container-q8">
+          
           <div class="custom-dropdown-header">
             <input type="text" id="q8-input" class="custom-dropdown-input" placeholder="Type or select an option" autocomplete="off" required>
-            <svg class="custom-dropdown-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            <div class="custom-dropdown-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
           </div>
           <div id="q8-list" class="custom-dropdown-list" style="display: none;">
             <div class="dropdown-item" data-value="Linkedin">Linkedin</div>
@@ -1191,15 +1216,21 @@
         const input = document.getElementById(inputId);
         const list = document.getElementById(listId);
         const hidden = document.getElementById(hiddenId);
+        const icon = document.querySelector('#' + containerId + ' .custom-dropdown-icon');
         if(!input || !list) return;
 
         let selectedValues = [];
         const items = list.querySelectorAll('.multi-item');
         const otherBtn = list.querySelector('.multi-other');
 
-        input.addEventListener('click', () => list.style.display = 'flex');
+        input.addEventListener('click', () => {
+            list.style.display = 'flex';
+            if(icon) icon.classList.add('open');
+        });
         
         input.addEventListener('input', (e) => {
+            list.style.display = 'flex';
+            if(icon) icon.classList.add('open');
             hidden.value = e.target.value; // Allow manual typing overrides natively 
         });
 
@@ -1224,6 +1255,7 @@
         if(otherBtn) {
             otherBtn.addEventListener('click', () => {
                 list.style.display = 'none';
+                if(icon) icon.classList.remove('open');
                 input.focus();
             });
         }
@@ -1231,6 +1263,7 @@
         document.addEventListener('click', (e) => {
             if(!e.target.closest('#' + containerId)) {
                 list.style.display = 'none';
+                if(icon) icon.classList.remove('open');
             }
         });
     }
@@ -1243,15 +1276,20 @@
     const ddInput = document.getElementById('q8-input');
     const ddList = document.getElementById('q8-list');
     const hiddenVal = document.getElementById('q8-hidden');
+    const ddIcon = document.querySelector('#container-q8 .custom-dropdown-icon');
     
     if(ddInput) {
       const items = ddList.querySelectorAll('.dropdown-item:not(.multi-other)');
       const otherBtn = ddList.querySelector('.multi-other');
 
-      ddInput.addEventListener('click', () => ddList.style.display = 'flex');
+      ddInput.addEventListener('click', () => {
+          ddList.style.display = 'flex';
+          if(ddIcon) ddIcon.classList.add('open');
+      });
 
       ddInput.addEventListener('input', (e) => {
         ddList.style.display = 'flex';
+        if(ddIcon) ddIcon.classList.add('open');
         const val = e.target.value.toLowerCase();
         items.forEach(item => {
           if(item.textContent.toLowerCase().includes(val)) {
@@ -1268,12 +1306,14 @@
           ddInput.value = item.textContent.trim();
           hiddenVal.value = item.dataset.value;
           ddList.style.display = 'none';
+          if(ddIcon) ddIcon.classList.remove('open');
         });
       });
 
       if(otherBtn) {
           otherBtn.addEventListener('click', () => {
               ddList.style.display = 'none';
+              if(ddIcon) ddIcon.classList.remove('open');
               ddInput.focus();
           });
       }
@@ -1281,6 +1321,7 @@
       document.addEventListener('click', (e) => {
         if(!e.target.closest('#container-q8')) {
           ddList.style.display = 'none';
+          if(ddIcon) ddIcon.classList.remove('open');
         }
       });
     }
@@ -1454,8 +1495,12 @@
   // --- GLOBAL VARIABLES ---
   var globalTimezoneList = [];
   var currentUserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
-  var currentBookingYear = new Date().getFullYear();
-  var currentBookingMonth = new Date().getMonth();
+  
+  // Dynamically set initial calendar view to the month of the first available date (24h buffer)
+  var _initialBufferDate = new Date(Date.now() + 24 * 60 * 60 * 1000);
+  var currentBookingYear = _initialBufferDate.getFullYear();
+  var currentBookingMonth = _initialBufferDate.getMonth();
+  
   var selectedDateStr = null;
   var activeSelectedSlot = null;
   var availableSlotsCache = [];
@@ -1595,7 +1640,7 @@
           const dateObj = new Date(currentBookingYear, currentBookingMonth, i);
           const dayOfWeek = dateObj.getDay();
 
-          if (dateObj < bufferMidnight || dayOfWeek === 0 || dayOfWeek === 6) {
+          if (dateObj < bufferMidnight) {
               d.className = "booking-day disabled opacity-20 cursor-not-allowed text-[var(--accent-color)]";
               d.innerText = i;
           } else {
